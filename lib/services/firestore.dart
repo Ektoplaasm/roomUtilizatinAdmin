@@ -22,12 +22,16 @@ class FirestoreService {
       'sched_id' : documentID,
     });
 
-    
 }
 
   //get data time start and end para butang sa taken start and end time
   Future<List<Map<String, dynamic>>> fetchSchedules() async {
     QuerySnapshot snapshot = await sched_details.get();
     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  }
+
+  //for user login
+  Future addUser(String userId, Map<String, dynamic>  userInfoMap){
+    return FirebaseFirestore.instance.collection("users").doc(userId).set(userInfoMap);
   }
 }
