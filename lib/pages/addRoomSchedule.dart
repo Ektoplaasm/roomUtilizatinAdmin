@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:admin_addschedule/services/firestore.dart';
+import 'package:admin_addschedule/main.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class AddRoomSchedule extends StatefulWidget {
+  const AddRoomSchedule({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AddRoomSchedule> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<AddRoomSchedule> {
   List<int> timeSchedValue = <int>[
     6, 7, 8, 9, 10, 11, 12,
     13, 14, 15, 16, 17, 18, 19,
@@ -59,8 +60,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Schedule'),
-      ),
+        title: const Text('Add Schedule')),
+      drawer: const DrawerCustom(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
