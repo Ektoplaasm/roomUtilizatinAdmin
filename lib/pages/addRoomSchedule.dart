@@ -1,19 +1,18 @@
-import 'package:admin_addschedule/main.dart';
-import 'package:admin_addschedule/services/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
-import 'package:intl/intl.dart';
+import 'package:admin_addschedule/services/firestore.dart';
+import 'package:admin_addschedule/main.dart';
 
 class AddRoomSchedule extends StatefulWidget {
   const AddRoomSchedule({super.key});
-  
+
   @override
   State<AddRoomSchedule> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<AddRoomSchedule> {
   List<int> timeSchedValue = <int>[
-    6, 7, 8, 9, 10, 11, 12, 
+    6, 7, 8, 9, 10, 11, 12,
     13, 14, 15, 16, 17, 18, 19,
   ];
   int selectedValueStart = 6;
@@ -36,6 +35,26 @@ class _HomePageState extends State<AddRoomSchedule> {
   TextEditingController instructor = TextEditingController();
   TextEditingController roomCode = TextEditingController();
   MultiSelectController selecteddayoftheweek = MultiSelectController();
+
+  List<int> takenTimes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingSchedules();
+  }
+
+  void _loadExistingSchedules() async {
+    List<Map<String, dynamic>> schedDetails = await firestoreService.fetchSchedules();
+    setState(() {
+      takenTimes = schedDetails.expand((schedDetail) {
+        return [
+          schedDetail['start_time'] as int,
+          schedDetail['end_time'] as int,
+        ];
+      }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +91,6 @@ class _HomePageState extends State<AddRoomSchedule> {
               ),
             ),
             MultiSelectDropDown(
-              // clearIcon: true,
               controller: selecteddayoftheweek,
               onOptionSelected: (options) {
                 setState(() {
@@ -90,77 +108,59 @@ class _HomePageState extends State<AddRoomSchedule> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              // Start Time Dropdown
-              DropdownButton<int>(
-              value: selectedValueStart,
-              items: timeSchedValue.map((int value) {
-                var displayString = value.toString();
-                if(displayString == '13'){
-                  displayString = '1';
-                } else if(displayString == '14'){
-                  displayString = '2';
-                } else if(displayString == '15'){
-                  displayString = '3';
-                } else if(displayString == '16'){
-                  displayString = '4';
-                } else if(displayString == '17'){
-                  displayString = '5';
-                } else if(displayString == '18'){
-                  displayString = '6';
-                } else if(displayString == '19'){
-                  displayString = '7';
-                }
-
-                var displayValue ='';
-                if(value < 12){displayValue = "$displayString AM";}else{displayValue = "$displayString PM";}
-                return DropdownMenuItem<int>(
-                  value: value,
-                  child: Text(displayValue),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                setState(() {
-                  selectedValueStart = newValue ?? selectedValueStart;
-                });
-              },
+                // Start Time Dropdown with disabled na time if selected na
+                DropdownButton<int>(
+                  value: selectedValueStart,
+                  items: timeSchedValue.map((int value) {
+                    bool isDisabled = takenTimes.contains(value);
+                    var displayString = _formatTime(value);
+                    var displayValue = _getTimeWithPeriod(value);
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text(
+                        displayValue,
+                        style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                      ),
+                      enabled: !isDisabled,
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    if (newValue != null && !takenTimes.contains(newValue)) {
+                      setState(() {
+                        selectedValueStart = newValue;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(width: 10,),
+                const Text("To"),
+                const SizedBox(width: 10,),
+                // End Time Dropdown with disabled na time if selected na
+                DropdownButton<int>(
+                  value: selectedValueEnd,
+                  items: timeSchedValue.map((int value) {
+                    bool isDisabled = takenTimes.contains(value);
+                    var displayString = _formatTime(value);
+                    var displayValue = _getTimeWithPeriod(value);
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text(
+                        displayValue,
+                        style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                      ),
+                      enabled: !isDisabled,
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    if (newValue != null && !takenTimes.contains(newValue)) {
+                      setState(() {
+                        selectedValueEnd = newValue;
+                      });
+                    }
+                  },
+                ),
+              ],
             ),
-            const SizedBox(width: 10,),
-            const Text("To"),
-            const SizedBox(width: 10,),
-            // End Time Dropdown
-            DropdownButton<int>(
-              value: selectedValueEnd,
-              items: timeSchedValue.map((int value) {
-                var displayString = value.toString();
-                if(displayString == '13'){
-                  displayString = '1';
-                } else if(displayString == '14'){
-                  displayString = '2';
-                } else if(displayString == '15'){
-                  displayString = '3';
-                } else if(displayString == '16'){
-                  displayString = '4';
-                } else if(displayString == '17'){
-                  displayString = '5';
-                } else if(displayString == '18'){
-                  displayString = '6';
-                } else if(displayString == '19'){
-                  displayString = '7';
-                }
-                var displayValue ='';
-                if(value < 12){displayValue = "$displayString AM";}else{displayValue = "$displayString PM";}
-                return DropdownMenuItem<int>(
-                  value: value,
-                  child: Text(displayValue),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                setState(() {
-                  selectedValueEnd = newValue ?? selectedValueEnd;
-                });
-              },
-            ),
-            ],),   
             ElevatedButton(
               onPressed: () {
                 firestoreService.addSched(
@@ -175,10 +175,21 @@ class _HomePageState extends State<AddRoomSchedule> {
               },
               child: const Text('Add Schedule to Firebase'),
             ),
-
           ],
         ),
       ),
     );
+  }
+
+  String _formatTime(int value) {
+    if (value >= 13 && value <= 19) {
+      return (value - 12).toString();
+    }
+    return value.toString();
+  }
+
+  String _getTimeWithPeriod(int value) {
+    String period = value < 12 ? 'AM' : 'PM';
+    return "${_formatTime(value)} $period";
   }
 }
