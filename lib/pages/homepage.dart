@@ -4,7 +4,7 @@ import 'package:multi_dropdown/multiselect_dropdown.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-  
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -14,6 +14,7 @@ class _HomePageState extends State<HomePage> {
     '6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', 
     '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM',
   ];
+  List<String> takenTimes = [];
   String selectedValueStart = '6AM';
   String selectedValueEnd = '6AM';
   List<ValueItem> dayoftheweek = const <ValueItem>[
@@ -34,6 +35,24 @@ class _HomePageState extends State<HomePage> {
   TextEditingController instructor = TextEditingController();
   TextEditingController roomCode = TextEditingController();
   MultiSelectController selecteddayoftheweek = MultiSelectController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingSchedules();
+  }
+
+  void _loadExistingSchedules() async {
+    List<Map<String, dynamic>> sched_details = await firestoreService.fetchSchedules();
+    setState(() {
+      takenTimes = sched_details.expand((sched_detail) {
+        return [
+          sched_detail['start_time'].toString(),
+          sched_detail['end_time'].toString(),
+        ];
+      }).toList() as List<String>;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +89,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             MultiSelectDropDown(
-              // clearIcon: true,
               controller: selecteddayoftheweek,
               onOptionSelected: (options) {
                 setState(() {
@@ -85,13 +103,18 @@ class _HomePageState extends State<HomePage> {
               optionTextStyle: const TextStyle(fontSize: 16),
               selectedOptionIcon: const Icon(Icons.check_circle),
             ),
-            // Start Time Dropdown
+            // Start Time Dropdown with time validaiton na siya ma grey if taken
             DropdownButton<String>(
               value: selectedValueStart,
               items: timeSchedValue.map((String value) {
+                bool isDisabled = takenTimes.contains(value);
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(
+                    value,
+                    style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                  ),
+                  enabled: !isDisabled,
                 );
               }).toList(),
               onChanged: (String? newValue) {
@@ -100,13 +123,19 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
-            // End Time Dropdown
+
+            // End Time Dropdown with time validaiton na siya ma grey if taken
             DropdownButton<String>(
               value: selectedValueEnd,
               items: timeSchedValue.map((String value) {
+                bool isDisabled = takenTimes.contains(value);
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(
+                    value,
+                    style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                  ),
+                  enabled: !isDisabled,
                 );
               }).toList(),
               onChanged: (String? newValue) {
@@ -130,7 +159,6 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text('Add Schedule to Firebase'),
             ),
-
           ],
         ),
       ),

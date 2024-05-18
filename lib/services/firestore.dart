@@ -17,8 +17,13 @@ class FirestoreService {
       'weekday' : weekdays,
       'semester_id' : 'OeuPodVAHxh2AKNQWU77'
     });
-}
+  }
 
+  //fetch time taken then store sa taken list didto sa fill up
+    Future<List<Map<String, dynamic>>> fetchSchedules() async {
+      QuerySnapshot snapshot = await sched_details.get();
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  }
 }
 
 
