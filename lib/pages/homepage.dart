@@ -1,6 +1,7 @@
 import 'package:admin_addschedule/services/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,12 +11,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> timeSchedValue = <String>[
-    '6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', 
-    '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM',
+  List<int> timeSchedValue = <int>[
+    6, 7, 8, 9, 10, 11, 12, 
+    13, 14, 15, 16, 17, 18, 19,
   ];
-  String selectedValueStart = '6AM';
-  String selectedValueEnd = '6AM';
+  int selectedValueStart = 6;
+  int selectedValueEnd = 6;
   List<ValueItem> dayoftheweek = const <ValueItem>[
     ValueItem(label: 'monday', value: 'monday'),
     ValueItem(label: 'tuesday', value: 'tuesday'),
@@ -85,36 +86,80 @@ class _HomePageState extends State<HomePage> {
               optionTextStyle: const TextStyle(fontSize: 16),
               selectedOptionIcon: const Icon(Icons.check_circle),
             ),
-            // Start Time Dropdown
-            DropdownButton<String>(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              // Start Time Dropdown
+              DropdownButton<int>(
               value: selectedValueStart,
-              items: timeSchedValue.map((String value) {
-                return DropdownMenuItem<String>(
+              items: timeSchedValue.map((int value) {
+                var displayString = value.toString();
+                if(displayString == '13'){
+                  displayString = '1';
+                } else if(displayString == '14'){
+                  displayString = '2';
+                } else if(displayString == '15'){
+                  displayString = '3';
+                } else if(displayString == '16'){
+                  displayString = '4';
+                } else if(displayString == '17'){
+                  displayString = '5';
+                } else if(displayString == '18'){
+                  displayString = '6';
+                } else if(displayString == '19'){
+                  displayString = '7';
+                }
+
+                var displayValue ='';
+                if(value < 12){displayValue = "$displayString AM";}else{displayValue = "$displayString PM";}
+                return DropdownMenuItem<int>(
                   value: value,
-                  child: Text(value),
+                  child: Text(displayValue),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
+              onChanged: (int? newValue) {
                 setState(() {
                   selectedValueStart = newValue ?? selectedValueStart;
                 });
               },
             ),
+            const SizedBox(width: 10,),
+            const Text("To"),
+            const SizedBox(width: 10,),
             // End Time Dropdown
-            DropdownButton<String>(
+            DropdownButton<int>(
               value: selectedValueEnd,
-              items: timeSchedValue.map((String value) {
-                return DropdownMenuItem<String>(
+              items: timeSchedValue.map((int value) {
+                var displayString = value.toString();
+                if(displayString == '13'){
+                  displayString = '1';
+                } else if(displayString == '14'){
+                  displayString = '2';
+                } else if(displayString == '15'){
+                  displayString = '3';
+                } else if(displayString == '16'){
+                  displayString = '4';
+                } else if(displayString == '17'){
+                  displayString = '5';
+                } else if(displayString == '18'){
+                  displayString = '6';
+                } else if(displayString == '19'){
+                  displayString = '7';
+                }
+                var displayValue ='';
+                if(value < 12){displayValue = "$displayString AM";}else{displayValue = "$displayString PM";}
+                return DropdownMenuItem<int>(
                   value: value,
-                  child: Text(value),
+                  child: Text(displayValue),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
+              onChanged: (int? newValue) {
                 setState(() {
                   selectedValueEnd = newValue ?? selectedValueEnd;
                 });
               },
             ),
+            ],),   
             ElevatedButton(
               onPressed: () {
                 firestoreService.addSched(
@@ -123,7 +168,6 @@ class _HomePageState extends State<HomePage> {
                   instructor.text,
                   roomCode.text,
                   selectedValueStart,
-                  selectedValueEnd,
                   selectedValueEnd,
                   selectedDays,
                 );

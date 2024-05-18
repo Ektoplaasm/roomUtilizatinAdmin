@@ -5,9 +5,12 @@ import 'package:multi_dropdown/multiselect_dropdown.dart';
 class FirestoreService {
   final CollectionReference sched_details = FirebaseFirestore.instance.collection('schedule_details');
 
-  Future<void> addSched(String classCode, String courseCode, String instructor, String roomCode, String startTime, String endTime, String selectedValueEnd, List<ValueItem> selectedDays){
+  Future<void> addSched(String classCode, String courseCode, String instructor, String roomCode, int startTime, int endTime, List<ValueItem> selectedDays){
     List weekdays = selectedDays.map((item) => item.value).toList();
-    return sched_details.add({
+
+    String documentID = sched_details.doc().id;
+    
+    return sched_details.doc(documentID).set({
       'class' : classCode,
       'course' : courseCode,
       'instructor' : instructor,
@@ -15,7 +18,8 @@ class FirestoreService {
       'start_time' : startTime,
       'end_time' : endTime,
       'weekday' : weekdays,
-      'semester_id' : 'OeuPodVAHxh2AKNQWU77'
+      'semester_id' : 'OeuPodVAHxh2AKNQWU77',
+      'sched_id' : documentID,
     });
 }
 
