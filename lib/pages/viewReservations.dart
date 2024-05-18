@@ -1,6 +1,7 @@
+import 'package:admin_addschedule/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:view_reservation/services/firestore.dart';
+import 'package:admin_addschedule/services/firestore.dart';
 
 class ViewReservations extends StatefulWidget {
   const ViewReservations({super.key});
@@ -15,6 +16,8 @@ class _ViewReservationsState extends State<ViewReservations> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("View Room Reservations"),),
+      drawer: const DrawerCustom(),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('reservations').snapshots(),
           builder: (context, snapshot){
