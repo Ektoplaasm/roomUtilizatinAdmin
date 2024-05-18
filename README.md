@@ -1,3 +1,3 @@
-# admin_addschedule
+# Room Utilization Admin Module
 
-A new Flutter project.
+Requirements for ITSD84 submission
