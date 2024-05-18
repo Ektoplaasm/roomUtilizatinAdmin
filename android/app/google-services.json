@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "791386930559",
+    "project_id": "roomutilization",
+    "storage_bucket": "roomutilization.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791386930559:android:3907a66c9d2035287dae4a",
+        "android_client_info": {
+          "package_name": "com.example.admin_addschedule"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK1VWDa7DFD39Nv6XsuykWZ6F0t6gUWz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791386930559:android:2e585f8535da0fc37dae4a",
+        "android_client_info": {
+          "package_name": "com.example.room_utilization"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK1VWDa7DFD39Nv6XsuykWZ6F0t6gUWz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
