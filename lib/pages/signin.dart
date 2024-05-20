@@ -1,4 +1,4 @@
-import 'package:admin_addschedule/pages/homepage.dart';
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
 import 'package:admin_addschedule/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class _SignInState extends State<SignIn> {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => SidebarXExampleApp()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -59,10 +59,10 @@ class _SignInState extends State<SignIn> {
                 height: 200,
                 width: 500,
                 decoration: BoxDecoration(
-                    // image: DecorationImage(
-                    //   // image: AssetImage('images/logo-black.png'),
-                    //   fit: BoxFit.cover,
-                    // ),
+                    image: DecorationImage(
+                      image: AssetImage('logo.png'),
+                      fit: BoxFit.cover,
+                    ),
                 ),
                 ),
               SizedBox(
@@ -160,20 +160,7 @@ class _SignInState extends State<SignIn> {
               SizedBox(
                 height: 40.0,
               ),
-              Text(
-                "or Sign In with",
-                style: TextStyle(
-                    color: Color(0xFF273671),
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.w500),
-              ),
-              SizedBox(
-                height: 30.0,
-              ),
               
-              SizedBox(
-                height: 40.0,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -191,7 +178,7 @@ class _SignInState extends State<SignIn> {
                           MaterialPageRoute(builder: (context) => SignUp()));
                     },
                     child: Text(
-                      "SignUp",
+                      "Create admin account!",
                       style: TextStyle(
                           color: Color(0xFF273671),
                           fontSize: 20.0,

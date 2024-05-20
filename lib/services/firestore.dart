@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/src/widgets/editable_text.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 
 class FirestoreService {
