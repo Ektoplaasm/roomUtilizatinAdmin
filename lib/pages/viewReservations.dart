@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +20,8 @@ class _ViewReservationsState extends State<ViewReservations> {
   Future<void> updateStatus(String docId) async {
     await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 1});
   }
-  Future<void> updateStatustoDisapprove(String docId) async {
-    await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 0});
+  Future<void> updateStatustoRejected(String docId) async {
+    await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 2});
   }
     
   @override
@@ -41,7 +40,10 @@ class _ViewReservationsState extends State<ViewReservations> {
           )),
       ),
       body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('reservations').snapshots(),
+          stream: FirebaseFirestore.instance
+            .collection('reservations')
+            .where('status', isEqualTo: 0)
+            .snapshots(),
           builder: (context, snapshot){
             if (snapshot.hasData){
               List<DataCell> displayedDataCell = [];
@@ -85,20 +87,60 @@ class _ViewReservationsState extends State<ViewReservations> {
                   displayStringEnd = '7 PM';
                 } else {displayStringEnd = "${item['end_time'].toString()} AM";}
 
-              // Checking and replacing status (1 = Reserved, else = Awaiting Action) 
-              String status = item['status'].toString() == '1' ? 'Reservation Approved' : 'Awaiting Approval';
+              String status;
+              Color color;
 
-              Color statustextColor = item['status'].toString() == '1' ? const Color.fromARGB(255, 0, 0, 0) : Color.fromARGB(255, 0, 0, 0);
+              switch (item['status'].toString()) {
+                case '1':
+                  status = 'Reservation Approved';
+                  color = const Color.fromARGB(255, 0, 128, 0); 
+                  break;
+                case '2':
+                  status = 'Reservation Disapproved';
+                  color = const Color.fromARGB(255, 255, 0, 0); 
+                  break;
+                case '0':
+                  status = 'Reservation Pending';
+                  color = const Color.fromARGB(255, 255, 165, 0);
+                  break;
+                default:
+                  status = 'Unknown Status';
+                  color = const Color.fromARGB(255, 0, 0, 0); 
+                  break;
+              }
 
-              Color statusBGColor = item['status'].toString() == '1' ? Colors.green : Color.fromARGB(255, 255, 119, 0);
+              Color statustextColor;
+              Color statusBGColor;
+              Color statusBorderColor;
 
-              Color statusBorderColor = item['status'].toString() == '1' ? Colors.green : Color.fromARGB(255, 255, 119, 0);
+              switch (item['status'].toString()) {
+                case '1':
+                  statustextColor = Colors.white;
+                  statusBGColor = Colors.green;
+                  statusBorderColor = Colors.green;
+                  break;
+                case '2':
+                  statustextColor = Colors.white;
+                  statusBGColor = const Color.fromARGB(255, 255, 0, 0);
+                  statusBorderColor = const Color.fromARGB(255, 255, 0, 0);
+                  break;
+                case '0':
+                  statustextColor = Colors.black;
+                  statusBGColor = const Color.fromARGB(255, 255, 165, 0);
+                  statusBorderColor = const Color.fromARGB(255, 255, 165, 0); 
+                  break;
+                default:
+                  statustextColor = Colors.black;
+                  statusBGColor = const Color.fromARGB(255, 0, 0, 0); 
+                  statusBorderColor = const Color.fromARGB(255, 0, 0, 0); 
+                  break;
+              }
 
               Widget statusWidget = Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: statusBGColor,
-                  borderRadius: BorderRadius.circular(20), 
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: statusBorderColor),
                 ),
                 child: Text(
@@ -107,7 +149,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                 ),
               );
 
-                
+              
                 displayedDataCell = [
                   DataCell(Center(child: Text(item['id'].toString()))),
                   DataCell(Center(child: Text(item['name'].toString()))),
@@ -131,13 +173,14 @@ class _ViewReservationsState extends State<ViewReservations> {
                             child: Icon(Icons.check, color: Colors.white),
                           ),
                         ),
+                        
                         Center(
                           child: ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 255, 0, 0)),
                             ),
                             onPressed: () {
-                              updateStatustoDisapprove(item.id);
+                              updateStatustoRejected(item.id);
                             },
                             child: Icon(Icons.close, color: Colors.white),
                           ),
@@ -150,35 +193,38 @@ class _ViewReservationsState extends State<ViewReservations> {
 
                 rows.add(DataRow(cells: displayedDataCell));
               }
-
-             
-              return FittedBox(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: DataTable(
-                    columns: const <DataColumn>[
-                      DataColumn(label: Expanded(child: Center(child: Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                    ],
-                    rows: rows.map((row) {
-                    final rowIndex = rows.indexOf(row);
-                    final color = rowIndex.isEven ? Colors.grey[200] : Colors.white;
-                    return DataRow(
-                      color: WidgetStateColor.resolveWith((states) => color!),
-                      cells: row.cells,
-                    );
-                  }).toList(),
+              
+              return Container(
+                alignment: Alignment.topCenter,
+                child: FittedBox(
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: DataTable(
+                        columns: const <DataColumn>[
+                          DataColumn(label: Expanded(child: Center(child: Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                          DataColumn(label: Expanded(child: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                        ],
+                        rows: rows.map((row) {
+                        final rowIndex = rows.indexOf(row);
+                        final color = rowIndex.isEven ? Colors.grey[200] : Colors.white;
+                        return DataRow(
+                          color: WidgetStateColor.resolveWith((states) => color!),
+                          cells: row.cells,
+                        );
+                      }).toList(),
+                      ),
+                    ),
                   ),
                 ),
               );
-
             }
             
             else {return const Center(child: CircularProgressIndicator());}

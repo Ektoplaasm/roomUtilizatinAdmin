@@ -2,6 +2,8 @@ import 'package:admin_addschedule/firebase_options.dart';
 import 'package:admin_addschedule/pages/addRoomSchedule.dart';
 import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
+import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
+import 'package:admin_addschedule/pages/viewReservationsDisapproved.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +70,12 @@ class SidebarXExampleApp extends StatelessWidget {
   String _getTitleByIndex(int index) {
     switch (index) {
       case 0:
-        return 'View Reservation';
+        return 'View Pending Reservation';
       case 1:
+      return 'View Approved Reservation';
+      case 2:
+      return 'View Disapproved Reservation';
+      case 3:
         return 'Add Schedule';
       default:
         return 'Page Not Found';
@@ -152,9 +158,25 @@ class ExampleSidebarX extends StatelessWidget {
       items: [
        SidebarXItem(
           icon: Icons.view_agenda,
-          label: 'View Reservations',
+          label: 'View Pending Reservations',
           onTap: () {
             _controller.selectIndex(0);
+          },
+        ),
+
+        SidebarXItem(
+          icon: Icons.view_agenda,
+          label: 'View Approved Reservations',
+          onTap: () {
+            _controller.selectIndex(1);
+          },
+        ),
+
+        SidebarXItem(
+          icon: Icons.view_agenda,
+          label: 'View Disapproved Reservations',
+          onTap: () {
+            _controller.selectIndex(2);
           },
         ),
       
@@ -162,7 +184,7 @@ class ExampleSidebarX extends StatelessWidget {
           icon: Icons.schedule,
           label: 'Add Schedule',
           onTap: () {
-            _controller.selectIndex(4);
+            _controller.selectIndex(3);
           },
         ),
         SidebarXItem(
@@ -214,6 +236,10 @@ class _ScreensExample extends StatelessWidget {
       case 0:
         return ViewReservations();
       case 1:
+        return ViewReservationsApproved();
+      case 2:
+        return ViewReservationsDisapproved();
+      case 3:
         return AddRoomSchedule();
       default:
         return SignIn();
