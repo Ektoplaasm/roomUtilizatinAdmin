@@ -1,5 +1,6 @@
-import 'package:admin_addschedule/main.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_addschedule/services/firestore.dart';
 
@@ -13,20 +14,41 @@ class ViewReservations extends StatefulWidget {
 class _ViewReservationsState extends State<ViewReservations> {
   final FirestoreService firestoreService = FirestoreService();
 
+  Future<void> SignOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> updateStatus(String docId) async {
+    await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 1});
+  }
+  Future<void> updateStatustoDisapprove(String docId) async {
+    await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 0});
+  }
+    
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("View Room Reservations"),),
-      drawer: const DrawerCustom(),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        title: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.view_compact, color: const Color.fromARGB(255, 0, 0, 0),),
+              SizedBox(width: 10,),
+              const Text("View Room Reservations", style: TextStyle(fontWeight: FontWeight.bold),),
+            ],
+          )),
+      ),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('reservations').snapshots(),
           builder: (context, snapshot){
             if (snapshot.hasData){
               List<DataCell> displayedDataCell = [];
+              List<DataRow> rows = [];
 
               for (var item in snapshot.data!.docs){
-                //Formatting Time
-                //Start Time
+                // Formatting Time
                 var displayStringStart = item['start_time'].toString();
                 if(displayStringStart == '13'){
                   displayStringStart = '1 PM';
@@ -45,7 +67,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                 } else {
                   displayStringStart = "${item['start_time'].toString()} AM";
                 }
-                //EndTime
+                // End Time
                 var displayStringEnd = item['end_time'].toString();
                 if(displayStringEnd == '13'){
                   displayStringEnd = '1 PM';
@@ -63,114 +85,105 @@ class _ViewReservationsState extends State<ViewReservations> {
                   displayStringEnd = '7 PM';
                 } else {displayStringEnd = "${item['end_time'].toString()} AM";}
 
+              // Checking and replacing status (1 = Reserved, else = Awaiting Action) 
+              String status = item['status'].toString() == '1' ? 'Reservation Approved' : 'Awaiting Approval';
 
-                //Checking and replacing status (1 = Reserved, else = Awaiting Action) 
-                String status = '';
-                if (item['status'].toString() == '1'){
-                  status = 'Reserved';
-                } else {status = 'Awaiting Action';}
-                //Adding firestore data to list
-                displayedDataCell.add(
-                  DataCell(Text(item['id'].toString())),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(item['name'].toString())),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(item['email'].toString())),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(item['room_id'].toString())),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(displayStringStart)),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(displayStringEnd)),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(item['reason'].toString())),
-                );
-                displayedDataCell.add(
-                  DataCell(Text(status)),
-                );
-              }
-              //Generate Table
-              return FittedBox(
-              //Table Header
-                child:  DataTable(
-              columns: const <DataColumn>[
-              DataColumn(label: Expanded(child: Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold)))),
-              DataColumn(label: Expanded(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold)))),
-              ], 
-              //Table Body
-              rows: <DataRow>[
-                for (int i = 0; i < displayedDataCell.length; i += 8)
-                  DataRow(cells: [displayedDataCell[i], displayedDataCell[i+1], displayedDataCell[i+2], displayedDataCell[i+3], displayedDataCell[i+4], displayedDataCell[i+5], displayedDataCell[i+6], displayedDataCell[i+7]])
-              ], ),
+              Color statustextColor = item['status'].toString() == '1' ? const Color.fromARGB(255, 0, 0, 0) : Color.fromARGB(255, 0, 0, 0);
+
+              Color statusBGColor = item['status'].toString() == '1' ? Colors.green : Color.fromARGB(255, 255, 119, 0);
+
+              Color statusBorderColor = item['status'].toString() == '1' ? Colors.green : Color.fromARGB(255, 255, 119, 0);
+
+              Widget statusWidget = Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: statusBGColor,
+                  borderRadius: BorderRadius.circular(20), 
+                  border: Border.all(color: statusBorderColor),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(color: statustextColor),
+                ),
               );
+
+                
+                displayedDataCell = [
+                  DataCell(Center(child: Text(item['id'].toString()))),
+                  DataCell(Center(child: Text(item['name'].toString()))),
+                  DataCell(Center(child: Text(item['email'].toString()))),
+                  DataCell(Center(child: Text(item['room_id'].toString()))),
+                  DataCell(Center(child: Text(displayStringStart))),
+                  DataCell(Center(child: Text(displayStringEnd))),
+                  DataCell(Center(child: Text(item['reason'].toString()))),
+                  DataCell(Center(child: statusWidget)),
+                  DataCell(
+                    Row(
+                      children: [
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.green),
+                            ),
+                            onPressed: () {
+                              updateStatus(item.id);
+                            },
+                            child: Icon(Icons.check, color: Colors.white),
+                          ),
+                        ),
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 255, 0, 0)),
+                            ),
+                            onPressed: () {
+                              updateStatustoDisapprove(item.id);
+                            },
+                            child: Icon(Icons.close, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                  ),
+                ];
+
+                rows.add(DataRow(cells: displayedDataCell));
+              }
+
+             
+              return FittedBox(
+                child: Container(
+                  alignment: Alignment.center,
+                  child: DataTable(
+                    columns: const <DataColumn>[
+                      DataColumn(label: Expanded(child: Center(child: Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                    ],
+                    rows: rows.map((row) {
+                    final rowIndex = rows.indexOf(row);
+                    final color = rowIndex.isEven ? Colors.grey[200] : Colors.white;
+                    return DataRow(
+                      color: WidgetStateColor.resolveWith((states) => color!),
+                      cells: row.cells,
+                    );
+                  }).toList(),
+                  ),
+                ),
+              );
+
             }
-            //Loading Icon When Data is being loaded
-            else {return const Row( mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [CircularProgressIndicator()],);}
+            
+            else {return const Center(child: CircularProgressIndicator());}
           } 
         )
-      );}}
-
-
-      
-
-
-      // DataTable(
-      //   columns: 
-      //   const <DataColumn>[
-      //     DataColumn(label: 
-      //     Expanded(child: Text('ID', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //     DataColumn(label: 
-      //     Expanded(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold),))
-      //     ),
-      //   ],
-      //   rows: 
-          // const<DataRow>[
-          //   DataRow(cells: <DataCell>[
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-          //     DataCell(Text('Test')),
-
-          //   ]
-          //   )
-          // ]
-
+      );
+  }
+}
