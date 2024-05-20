@@ -88,31 +88,28 @@ class _ViewReservationsDisapprovedState extends State<ViewReservationsDisapprove
                   displayStringEnd = '7 PM';
                 } else {displayStringEnd = "${item['end_time'].toString()} AM";}
 
-              // Checking and replacing status (1 = Reserved, else = Awaiting Action) 
               String status;
               Color color;
 
-              // Determine the status and color based on item['status']
               switch (item['status'].toString()) {
                 case '1':
                   status = 'Reservation Approved';
-                  color = const Color.fromARGB(255, 0, 128, 0); // Green color for approved status
+                  color = const Color.fromARGB(255, 0, 128, 0); 
                   break;
                 case '2':
                   status = 'Reservation Disapproved';
-                  color = const Color.fromARGB(255, 255, 0, 0); // Red color for disapproved status
+                  color = const Color.fromARGB(255, 255, 0, 0);
                   break;
                 case '0':
                   status = 'Reservation Pending';
-                  color = const Color.fromARGB(255, 255, 165, 0); // Orange color for pending status
+                  color = const Color.fromARGB(255, 255, 165, 0); 
                   break;
                 default:
                   status = 'Unknown Status';
-                  color = const Color.fromARGB(255, 0, 0, 0); // Black color for unknown status
+                  color = const Color.fromARGB(255, 0, 0, 0); 
                   break;
               }
 
-              // Determine text color, background color, and border color based on item['status']
               Color statustextColor;
               Color statusBGColor;
               Color statusBorderColor;
@@ -125,22 +122,21 @@ class _ViewReservationsDisapprovedState extends State<ViewReservationsDisapprove
                   break;
                 case '2':
                   statustextColor = Colors.white;
-                  statusBGColor = const Color.fromARGB(255, 255, 0, 0); // Red background for disapproved status
-                  statusBorderColor = const Color.fromARGB(255, 255, 0, 0); // Red border for disapproved status
+                  statusBGColor = const Color.fromARGB(255, 255, 0, 0); 
+                  statusBorderColor = const Color.fromARGB(255, 255, 0, 0); 
                   break;
                 case '0':
                   statustextColor = Colors.black;
-                  statusBGColor = const Color.fromARGB(255, 255, 165, 0); // Orange background for pending status
-                  statusBorderColor = const Color.fromARGB(255, 255, 165, 0); // Orange border for pending status
+                  statusBGColor = const Color.fromARGB(255, 255, 165, 0);
+                  statusBorderColor = const Color.fromARGB(255, 255, 165, 0);
                   break;
                 default:
                   statustextColor = Colors.black;
-                  statusBGColor = const Color.fromARGB(255, 0, 0, 0); // Black background for unknown status
-                  statusBorderColor = const Color.fromARGB(255, 0, 0, 0); // Black border for unknown status
+                  statusBGColor = const Color.fromARGB(255, 0, 0, 0);
+                  statusBorderColor = const Color.fromARGB(255, 0, 0, 0);
                   break;
               }
 
-              // Create the status widget
               Widget statusWidget = Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
