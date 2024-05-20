@@ -59,13 +59,16 @@ class _SignUpState extends State<SignUp> {
         child: Container(
           child: Column(
             children: [
+              SizedBox(
+                height: 30.0,
+              ),
               Container(
                   width: 500,
                   height: 200,
-                  // child: Image.asset(
-                  //   "images/logo-black.PNG",
-                  //   fit: BoxFit.cover,
-                  // )
+                  child: Image.asset(
+                    "logo.PNG",
+                    fit: BoxFit.cover,
+                  )
                   ),
               SizedBox(
                 height: 30.0,
@@ -77,11 +80,12 @@ class _SignUpState extends State<SignUp> {
                   child: Column(
                     children: [
                       Container(
+                        width: 500,
                         padding:
                             EdgeInsets.symmetric(vertical: 2.0, horizontal: 30.0),
                         decoration: BoxDecoration(
                             color: Color(0xFFedf0f8),
-                            borderRadius: BorderRadius.circular(30)),
+                            borderRadius: BorderRadius.circular(10)),
                         child: TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -101,11 +105,12 @@ class _SignUpState extends State<SignUp> {
                         height: 30.0,
                       ),
                       Container(
+                        width: 500,
                         padding:
                             EdgeInsets.symmetric(vertical: 2.0, horizontal: 30.0),
                         decoration: BoxDecoration(
                             color: Color(0xFFedf0f8),
-                            borderRadius: BorderRadius.circular(30)),
+                            borderRadius: BorderRadius.circular(10)),
                         child: TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -120,7 +125,7 @@ class _SignUpState extends State<SignUp> {
                               hintText: "Password",
                               hintStyle: TextStyle(
                                   color: Color(0xFFb2b7bf), fontSize: 18.0)),
-               obscureText: true,  ),
+                              obscureText: true,  ),
                       ),
                       SizedBox(
                         height: 30.0,
@@ -136,12 +141,12 @@ class _SignUpState extends State<SignUp> {
                           registration();
                         },
                         child: Container(
-                            width: MediaQuery.of(context).size.width,
+                            width: 500,
                             padding: EdgeInsets.symmetric(
                                 vertical: 13.0, horizontal: 30.0),
                             decoration: BoxDecoration(
                                 color: Color(0xFF273671),
-                                borderRadius: BorderRadius.circular(30)),
+                                borderRadius: BorderRadius.circular(10)),
                             child: Center(
                                 child: Text(
                               "Sign Up",
@@ -155,16 +160,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 40.0,
-              ),
-              Text(
-                "or LogIn with",
-                style: TextStyle(
-                    color: Color(0xFF273671),
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.w500),
-              ),
+              
               SizedBox(
                 height: 30.0,
               ),
