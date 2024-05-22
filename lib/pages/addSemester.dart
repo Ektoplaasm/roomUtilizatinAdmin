@@ -32,17 +32,18 @@ class _SemesterState extends State<Semester> {
   }
 
   Future<void> _addSemester() async {
-    await _firestoreService.addSemester(
-      _startDate as String,
-      _semesterNameController.text,
-      _endDate as String,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Semester added successfully')),
-    );
+  await _firestoreService.addSemester(
+    _startDate,
+    _semesterNameController.text,
+    _endDate,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Semester added successfully')),
+  );
 
-    _semesterNameController.clear();
-  }
+  _semesterNameController.clear();
+}
+
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
@@ -63,10 +64,11 @@ class _SemesterState extends State<Semester> {
   }
 
   String _formatDate(DateTime date) {
-    final DateFormat formatter = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z');
-    final String formattedDate = formatter.format(date.toLocal());
-    return formattedDate;
-  }
+  final DateFormat formatter = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z');
+  final String formattedDate = formatter.format(date.toLocal());
+  return formattedDate;
+}
+
 
   @override
   Widget build(BuildContext context) {
