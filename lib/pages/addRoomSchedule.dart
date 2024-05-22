@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:admin_addschedule/services/firestore.dart';
@@ -165,8 +166,14 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                   
                   List<Map<String, dynamic>> rooms = snapshot.data!;
-                  return DropdownButton<String>(
+                  return DropdownButtonFormField2<String>(
                     hint: Text("Select a Room"),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+
+                      )
+                    ),
                     value: _selectedRoom,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -183,6 +190,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 }
               },
               ),
+              SizedBox(height: 15,),
               FutureBuilder<List<Map<String, dynamic>>>(
               future: firestoreService.fetchSemester(),
               builder: (context, snapshot) {
@@ -195,8 +203,14 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                
                   List<Map<String, dynamic>> semesters = snapshot.data!;
-                  return DropdownButton<String>(
+                  return DropdownButtonFormField2<String>(
                     hint: Text("Select a Semester"),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+
+                      )
+                    ),
                     value: _selectedSemester,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -227,7 +241,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 inputDecoration: BoxDecoration(
                   
                   borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(color: Colors.black),
+                  border: Border.all(color: Colors.grey)
                   
                 ),
                 

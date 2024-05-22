@@ -129,7 +129,7 @@ class ExampleSidebarX extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.28),
-              blurRadius: 30,
+              blurRadius: 10,
             )
           ],
         ),
@@ -261,11 +261,16 @@ class _ScreensExample extends StatelessWidget {
   }
 }
 
-const primaryColor = Color(0xFF685BFF);
+const primaryColor = Color(0xff274c77);
 const canvasColor = Color.fromARGB(255, 255, 255, 255);
-const scaffoldBackgroundColor = Color.fromARGB(255, 255, 255, 255);
-const accentCanvasColor = Color.fromARGB(255, 95, 95, 191);
-const white = Color.fromARGB(255, 102, 102, 102);
+const scaffoldBackgroundColor = Color(0xfff0f4f9);
+const accentCanvasColor = Color.fromARGB(255, 174, 212, 255);
+const white = Color.fromARGB(255, 188, 188, 188);
 final actionColor = Color.fromARGB(255, 55, 55, 126).withOpacity(0.6);
 final divider = Divider(color: white.withOpacity(0.3), height: 1);
-const hovercolormain = Color.fromARGB(255, 51, 47, 169);
+const hovercolormain = Color.fromARGB(255, 162, 162, 162);
+// const Color primaryColor = Color(0xff274c77);
+// const Color secondaryColor = Color(0xff4f749f);
+// const Color bgColor = Color(0xfff0f4f9);
+// const Color outlineColor = Color(0xffE4E4E4);
+// const Color highlightColor = Color(0xffF8FDFF);
