@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:admin_addschedule/services/firestore.dart';
 import 'package:admin_addschedule/main.dart';
+import 'package:quiver/iterables.dart';
 
 class AddRoomSchedule extends StatefulWidget {
   const AddRoomSchedule({super.key});
@@ -19,13 +20,13 @@ class _HomePageState extends State<AddRoomSchedule> {
   int selectedValueStart = 6;
   int selectedValueEnd = 6;
   List<ValueItem> dayoftheweek = const <ValueItem>[
-    ValueItem(label: 'monday', value: 'monday'),
-    ValueItem(label: 'tuesday', value: 'tuesday'),
-    ValueItem(label: 'wednesday', value: 'wednesday'),
-    ValueItem(label: 'thursday', value: 'thursday'),
-    ValueItem(label: 'friday', value: 'friday'),
-    ValueItem(label: 'saturday', value: 'saturday'),
-    ValueItem(label: 'sunday', value: 'sunday'),
+    ValueItem(label: 'Monday', value: 'monday'),
+    ValueItem(label: 'Tuesday', value: 'tuesday'),
+    ValueItem(label: 'Wednesday', value: 'wednesday'),
+    ValueItem(label: 'Thursday', value: 'thursday'),
+    ValueItem(label: 'Friday', value: 'friday'),
+    ValueItem(label: 'Saturday', value: 'saturday'),
+    ValueItem(label: 'Sunday', value: 'sunday'),
   ];
   List<ValueItem> selectedDays = [];
 
@@ -38,13 +39,17 @@ class _HomePageState extends State<AddRoomSchedule> {
   MultiSelectController selecteddayoftheweek = MultiSelectController();
 
   List<int> takenTimes = [];
+  var chunks = [];
 
+  
   @override
   void initState() {
     super.initState();
     _loadExistingSchedules();
     fetchsemester();
   }
+
+  // start time => disabled <= end time
 
   void _loadExistingSchedules() async {
     List<Map<String, dynamic>> schedDetails = await firestoreService.fetchSchedules();
@@ -252,7 +257,19 @@ class _HomePageState extends State<AddRoomSchedule> {
                   DropdownButton<int>(
                     value: selectedValueStart,
                     items: timeSchedValue.map((int value) {
-                      bool isDisabled = takenTimes.contains(value);
+
+                      List list = [];
+                      if(takenTimes.isNotEmpty){
+                      var pairs = partition(takenTimes, 2);
+                      for(List<int> pair in pairs){
+                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
+                        list.addAll(timeSlots);
+                        print(list); 
+                      } 
+                      }
+                      bool isDisabled = list.contains(value);
+
+
                       var displayString = _formatTime(value);
                       var displayValue = _getTimeWithPeriod(value);
                       return DropdownMenuItem<int>(
@@ -279,7 +296,19 @@ class _HomePageState extends State<AddRoomSchedule> {
                   DropdownButton<int>(
                     value: selectedValueEnd,
                     items: timeSchedValue.map((int value) {
-                      bool isDisabled = takenTimes.contains(value);
+                      List list = [];
+                      if(takenTimes.isNotEmpty){
+                      var pairs = partition(takenTimes, 2);
+                      for(List<int> pair in pairs){
+                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
+                        list.addAll(timeSlots);
+                        print(list); 
+                      } 
+                      }
+                      bool isDisabled = list.contains(value);
+
+
+
                       var displayString = _formatTime(value);
                       var displayValue = _getTimeWithPeriod(value);
                       return DropdownMenuItem<int>(
