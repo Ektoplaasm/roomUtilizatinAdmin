@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:admin_addschedule/services/firestore.dart';
@@ -170,6 +171,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                   
                   List<Map<String, dynamic>> rooms = snapshot.data!;
+
                   return DropdownButtonFormField<String>(
                     isExpanded: true,
                     decoration: InputDecoration(
@@ -177,6 +179,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       border: OutlineInputBorder(),
                       hintStyle: TextStyle(fontSize: 17,),
                       prefixIcon: Icon(Icons.sensor_door_rounded)
+
                     ),
                     value: _selectedRoom,
                     onChanged: (String? newValue) {
@@ -207,6 +210,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                
                   List<Map<String, dynamic>> semesters = snapshot.data!;
+
                   return DropdownButtonFormField<String>(
                     isExpanded: true,
                     decoration: InputDecoration(
@@ -216,6 +220,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       prefixIcon: Icon(Icons.lock_clock_rounded)
                     ),
                     borderRadius: BorderRadius.circular(5),
+
                     value: _selectedSemester,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -247,12 +252,12 @@ class _HomePageState extends State<AddRoomSchedule> {
                 inputDecoration: BoxDecoration(
                   
                   borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(color: Colors.black),
+                  border: Border.all(color: Colors.grey)
                   
                 ),
                 
                 hint: 'Select the day of the week.',
-                hintStyle: TextStyle(fontSize: 17,), 
+                hintStyle: TextStyle(fontSize: 16, color: Colors.grey), 
                 
                 
                 options: dayoftheweek,

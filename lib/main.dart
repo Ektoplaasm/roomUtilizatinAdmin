@@ -4,6 +4,7 @@ import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
 import 'package:admin_addschedule/pages/viewReservationsDisapproved.dart';
+import 'package:admin_addschedule/pages/viewRoomSchedule.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -21,7 +22,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignIn(),
+      home: ViewRoomSchedule(),
     );
   }
 }
