@@ -47,7 +47,7 @@ class FirestoreService {
     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
   }
 
-  Future<void> addSemester(String end_date, String semester_name, String start_date,){
+  Future<void> addSemester(DateTime end_date, String semester_name, DateTime start_date,){
     String documentID = sched_details.doc().id;
     
     return listofsemester.doc(documentID).set({
@@ -55,6 +55,7 @@ class FirestoreService {
       'semester_name' : semester_name,
       'start_date' : start_date,
       'id' : documentID,
+      'date_created' : DateTime.now(),
     });
 
   }
