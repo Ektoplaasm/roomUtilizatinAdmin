@@ -29,6 +29,7 @@ class _HomePageState extends State<AddRoomSchedule> {
     ValueItem(label: 'Saturday', value: 'saturday'),
     ValueItem(label: 'Sunday', value: 'sunday'),
   ];
+  List<String> daysoftheweek = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
   List<ValueItem> selectedDays = [];
 
   final FirestoreService firestoreService = FirestoreService();
@@ -46,16 +47,16 @@ class _HomePageState extends State<AddRoomSchedule> {
   @override
   void initState() {
     super.initState();
-    _loadExistingSchedules();
+    _loadExistingSchedules(null, null, null);
     fetchsemester();
   }
 
   // start time => disabled <= end time
 
-  void _loadExistingSchedules() async {
-    List<Map<String, dynamic>> schedDetails = await firestoreService.fetchSchedules();
+  void _loadExistingSchedules(roomId, semId, day) async {
+    List<Map<String, dynamic>>? schedDetails = await firestoreService.fetchSchedules(roomId, semId, day);
     setState(() {
-      takenTimes = schedDetails.expand((schedDetail) {
+      takenTimes = schedDetails!.expand((schedDetail) {
         return [
           schedDetail['start_time'] as int,
           schedDetail['end_time'] as int,
@@ -97,9 +98,11 @@ class _HomePageState extends State<AddRoomSchedule> {
 
   String? _selectedSemester;
   String? _selectedRoom;
+  String? _selectedDay;
 
   @override
   Widget build(BuildContext context) {
+    print(_selectedDay);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 255, 255, 255),
@@ -185,6 +188,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedRoom = newValue;
+                        _loadExistingSchedules(newValue, _selectedSemester, _selectedDay);
                       });
                     },
                     items: rooms.map((room) {
@@ -225,6 +229,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedSemester = newValue;
+                        _loadExistingSchedules(_selectedRoom, newValue, _selectedDay);
                       });
                     },
                     items: semesters.map((semester) {
@@ -240,34 +245,57 @@ class _HomePageState extends State<AddRoomSchedule> {
               ),
 
               SizedBox(height: 15,),
-              MultiSelectDropDown(
-                controller: selecteddayoftheweek,
-                onOptionSelected: (options) {
-                  setState(() {
-                    selectedDays = options;
-                  });
+              DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      hintText: "Select a Day" ,
+                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(fontSize: 17,),
+                      prefixIcon: Icon(Icons.lock_clock_rounded)
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                    value: _selectedDay,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedDay = newValue;
+                        _loadExistingSchedules(_selectedRoom, _selectedSemester, newValue);
+                      });
+                    },
+                    items: daysoftheweek.map((val) {
+                      return DropdownMenuItem(
+                        child: Text(val[0].toUpperCase() + val.substring(1).toLowerCase()),
+                        value: val,
+                      );
+                    }).toList(),
+                  ),
+              // MultiSelectDropDown(
+              //   controller: selecteddayoftheweek,
+              //   onOptionSelected: (options) {
+              //     setState(() {
+              //       selectedDays = options;
+              //     });
                   
-                },
+              //   },
                 
-                inputDecoration: BoxDecoration(
+              //   inputDecoration: BoxDecoration(
                   
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(color: Colors.grey)
+                  // borderRadius: BorderRadius.all(Radius.circular(5)),
+                  // border: Border.all(color: Colors.black),
                   
-                ),
+              //   ),
                 
-                hint: 'Select the day of the week.',
-                hintStyle: TextStyle(fontSize: 16, color: Colors.grey), 
+                // hint: 'Select the day of the week.',
+                // hintStyle: TextStyle(fontSize: 17,), 
                 
                 
-                options: dayoftheweek,
-                maxItems: 7,
-                selectionType: SelectionType.multi,
-                chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                dropdownHeight: 300,
-                optionTextStyle: const TextStyle(fontSize: 16),
-                selectedOptionIcon: const Icon(Icons.check_circle),
-              ),
+              //   options: dayoftheweek,
+              //   maxItems: 7,
+              //   selectionType: SelectionType.multi,
+              //   chipConfig: const ChipConfig(wrapType: WrapType.wrap, backgroundColor: Colors.black),
+              //   dropdownHeight: 300,
+              //   optionTextStyle: const TextStyle(fontSize: 16, color: Colors.black),
+              //   selectedOptionIcon: const Icon(Icons.check_circle, color: Colors.black,),
+              // ),
               
               SizedBox(height: 15,),
 
@@ -284,7 +312,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       for(List<int> pair in pairs){
                         var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
                         list.addAll(timeSlots);
-                        print(list); 
+                        // print(list); 
                       } 
                       }
                       bool isDisabled = list.contains(value);
@@ -322,7 +350,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       for(List<int> pair in pairs){
                         var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
                         list.addAll(timeSlots);
-                        print(list); 
+                        // print(list); 
                       } 
                       }
                       bool isDisabled = list.contains(value);
@@ -361,7 +389,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                     _selectedRoom!,
                     selectedValueStart,
                     selectedValueEnd,
-                    selectedDays,
+                    _selectedDay,
                     _selectedSemester!,
                   );
                 },

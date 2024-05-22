@@ -7,8 +7,9 @@ class FirestoreService {
   final CollectionReference listofsemester = FirebaseFirestore.instance.collection('semester');
   
 
-  Future<void> addSched(String classCode, String courseCode, String instructor, String roomCode, int startTime, int endTime, List<ValueItem> selectedDays, String _selectedSemester){
-    List weekdays = selectedDays.map((item) => item.value).toList();
+  Future<void> addSched(String classCode, String courseCode, String instructor, String roomCode, int startTime, int endTime, String? selectedDay, String _selectedSemester){
+    // List<String> weekdays = selectedDays.m
+    // List weekdays = selectedDays.map((item) => item.value).toList();
 
     String documentID = sched_details.doc().id;
     
@@ -19,7 +20,7 @@ class FirestoreService {
       'room_id' : roomCode,
       'start_time' : startTime,
       'end_time' : endTime,
-      'weekday' : weekdays,
+      'weekday' : selectedDay,
       'semester_id' : _selectedSemester,
       'sched_id' : documentID,
     });
@@ -27,9 +28,14 @@ class FirestoreService {
   }
 
   //get data time start and end para butang sa taken start and end time
-  Future<List<Map<String, dynamic>>> fetchSchedules() async {
-    QuerySnapshot snapshot = await sched_details.get();
+  Future<List<Map<String, dynamic>>?> fetchSchedules(roomId, semId, day) async {
+    if(roomId != null && semId != null && day != null ) {
+    QuerySnapshot snapshot = await sched_details.where('room_id', isEqualTo: roomId).where('semester_id', isEqualTo: semId).where('weekday', isEqualTo: day).get();
     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } else {
+      return null;
+    }
+    
   }
 
   //for user login
