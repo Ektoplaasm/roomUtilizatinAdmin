@@ -33,9 +33,9 @@ class _SemesterState extends State<Semester> {
 
   Future<void> _addSemester() async {
     await _firestoreService.addSemester(
-      _startDate,
+      _startDate as String,
       _semesterNameController.text,
-      _endDate,
+      _endDate as String,
     );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Semester added successfully')),
