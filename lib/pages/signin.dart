@@ -60,7 +60,7 @@ class _SignInState extends State<SignIn> {
                 width: 500,
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('logo.png'),
+                      image: AssetImage('assets/logo.png'),
                       fit: BoxFit.cover,
                     ),
                 ),
