@@ -246,7 +246,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 ),
                 
                 hint: 'Select the day of the week.',
-                hintStyle: TextStyle(fontSize: 17,), 
+                hintStyle: TextStyle(fontSize: 16, color: Colors.grey), 
                 
                 
                 options: dayoftheweek,

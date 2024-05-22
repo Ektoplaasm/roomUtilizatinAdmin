@@ -5,6 +5,7 @@ import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
 import 'package:admin_addschedule/pages/viewReservationsDisapproved.dart';
+import 'package:admin_addschedule/pages/viewRoomSchedule.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -73,12 +74,14 @@ class SidebarXExampleApp extends StatelessWidget {
       case 0:
         return 'View Pending Reservation';
       case 1:
-      return 'View Approved Reservation';
+        return 'View Approved Reservation';
       case 2:
-      return 'View Disapproved Reservation';
+        return 'View Disapproved Reservation';
       case 3:
-        return 'Add Schedule';
+        return 'Schedules';
       case 4:
+        return 'Add Schedule';
+      case 5:
         return 'Add Semester';
       default:
         return 'Page Not Found';
@@ -106,8 +109,8 @@ class ExampleSidebarX extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         hoverColor: hovercolormain,
-        textStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.7)),
-        selectedTextStyle: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+        textStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+        selectedTextStyle: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         hoverTextStyle: const TextStyle(
           color: Color.fromARGB(255, 0, 0, 0),
           fontWeight: FontWeight.w500,
@@ -124,14 +127,15 @@ class ExampleSidebarX extends StatelessWidget {
             color: actionColor.withOpacity(0.37),
           ),
           gradient: const LinearGradient(
-            colors: [accentCanvasColor, canvasColor],
+            colors: [accentCanvasColor, gradient2nd],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.28),
-              blurRadius: 10,
-            )
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(0.28),
+          //     blurRadius: 10,
+          //   ),
+          // ],
+          
         ),
         iconTheme: IconThemeData(
           color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.7),
@@ -182,12 +186,20 @@ class ExampleSidebarX extends StatelessWidget {
             _controller.selectIndex(2);
           },
         ),
+
+        SidebarXItem(
+          icon: Icons.view_agenda,
+          label: 'Schedules',
+          onTap: () {
+            _controller.selectIndex(3);
+          },
+        ),
       
         SidebarXItem(
           icon: Icons.schedule,
           label: 'Add Schedule',
           onTap: () {
-            _controller.selectIndex(3);
+            _controller.selectIndex(4);
           },
         ),
 
@@ -195,7 +207,7 @@ class ExampleSidebarX extends StatelessWidget {
           icon: Icons.schedule,
           label: 'Add Semester',
           onTap: () {
-            _controller.selectIndex(4);
+            _controller.selectIndex(5);
           },
         ),
 
@@ -252,8 +264,10 @@ class _ScreensExample extends StatelessWidget {
       case 2:
         return ViewReservationsDisapproved();
       case 3:
-        return AddRoomSchedule();
+        return ViewRoomSchedule();
       case 4:
+        return AddRoomSchedule();
+      case 5:
         return Semester();
       default:
         return SignIn();
@@ -263,8 +277,9 @@ class _ScreensExample extends StatelessWidget {
 
 const primaryColor = Color(0xff274c77);
 const canvasColor = Color.fromARGB(255, 255, 255, 255);
+const gradient2nd = Color(0xff274c77);
 const scaffoldBackgroundColor = Color(0xfff0f4f9);
-const accentCanvasColor = Color.fromARGB(255, 174, 212, 255);
+const accentCanvasColor = Color(0xff274c77);
 const white = Color.fromARGB(255, 188, 188, 188);
 final actionColor = Color.fromARGB(255, 55, 55, 126).withOpacity(0.6);
 final divider = Divider(color: white.withOpacity(0.3), height: 1);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:admin_addschedule/services/firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Semester extends StatefulWidget {
   const Semester({Key? key}) : super(key: key);
@@ -31,18 +32,15 @@ class _SemesterState extends State<Semester> {
   }
 
   Future<void> _addSemester() async {
-    final String formattedStartDate = _formatDate(_startDate);
-    final String formattedEndDate = _formatDate(_endDate);
-
     await _firestoreService.addSemester(
-      formattedStartDate,
+      _startDate,
       _semesterNameController.text,
-      formattedEndDate,
+      _endDate,
     );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Semester added successfully')),
     );
-    
+
     _semesterNameController.clear();
   }
 
@@ -74,49 +72,86 @@ class _SemesterState extends State<Semester> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Semester'),
+        title: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_box),
+              SizedBox(width: 10,),
+              Text('Add Semester', style: TextStyle(fontWeight: FontWeight.bold),),
+            ],
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextField(
-              controller: _semesterNameController,
-              decoration: InputDecoration(labelText: 'Semester Name'),
-            ),
-            SizedBox(height: 20),
-            Row(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            margin: EdgeInsets.only(top: 10, left: 300, right: 300),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Start Date:'),
-                SizedBox(width: 10),
-                TextButton(
-                  onPressed: () => _selectDate(context, true),
-                  child: Text(
-                    _formatDate(_startDate),
+                TextField(
+                  controller: _semesterNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Semester Name',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide()
+                    ),
+                    prefixIcon: Icon(Icons.date_range),
+                    suffixIcon: Icon(Icons.info),
+
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('Start Date:'),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () => _selectDate(context, true),
+                            child: Text(
+                              _formatDate(_startDate),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(' End Date:'),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () => _selectDate(context, false),
+                          child: Text(
+                            _formatDate(_endDate),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                  ]
+                ),
+                
+                SizedBox(height: 20),
+                Center(
+                  
+                  child: ElevatedButton(
+                    onPressed: _addSemester,
+                    child: Text('Add Semester'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Row(
-              children: <Widget>[
-                Text('End Date:'),
-                SizedBox(width: 10),
-                TextButton(
-                  onPressed: () => _selectDate(context, false),
-                  child: Text(
-                    _formatDate(_endDate),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _addSemester,
-              child: Text('Add Semester'),
-            ),
-          ],
+          ),
         ),
       ),
     );
