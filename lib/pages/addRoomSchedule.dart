@@ -170,8 +170,14 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                   
                   List<Map<String, dynamic>> rooms = snapshot.data!;
-                  return DropdownButton<String>(
-                    hint: Text("Select a Room"),
+                  return DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      hintText: "Select Room" ,
+                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(fontSize: 17,),
+                      prefixIcon: Icon(Icons.sensor_door_rounded)
+                    ),
                     value: _selectedRoom,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -188,6 +194,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 }
               },
               ),
+              SizedBox(height: 15,),
               FutureBuilder<List<Map<String, dynamic>>>(
               future: firestoreService.fetchSemester(),
               builder: (context, snapshot) {
@@ -200,8 +207,15 @@ class _HomePageState extends State<AddRoomSchedule> {
                 } else {
                
                   List<Map<String, dynamic>> semesters = snapshot.data!;
-                  return DropdownButton<String>(
-                    hint: Text("Select a Semester"),
+                  return DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      hintText: "Select a Semester" ,
+                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(fontSize: 17,),
+                      prefixIcon: Icon(Icons.lock_clock_rounded)
+                    ),
+                    borderRadius: BorderRadius.circular(5),
                     value: _selectedSemester,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -215,6 +229,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       );
                     }).toList(),
                   );
+                  
                 }
               },
               ),
