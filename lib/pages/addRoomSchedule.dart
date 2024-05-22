@@ -11,6 +11,7 @@ class AddRoomSchedule extends StatefulWidget {
 }
 
 class _HomePageState extends State<AddRoomSchedule> {
+  List<DropdownMenuItem<String>> _dropdownMenuItems = [];
   List<int> timeSchedValue = <int>[
     6, 7, 8, 9, 10, 11, 12,
     13, 14, 15, 16, 17, 18, 19,
@@ -42,6 +43,7 @@ class _HomePageState extends State<AddRoomSchedule> {
   void initState() {
     super.initState();
     _loadExistingSchedules();
+    fetchsemester();
   }
 
   void _loadExistingSchedules() async {
@@ -55,6 +57,40 @@ class _HomePageState extends State<AddRoomSchedule> {
       }).toList();
     });
   }
+
+  void fetchsemester() async {
+    List<Map<String, dynamic>> listofsemester = await firestoreService.fetchSemester();
+    ((List<Map<String, dynamic>> semesters) {
+      setState(() {
+        
+        _dropdownMenuItems.add(DropdownMenuItem(child: Text('Select a Semester'), value: null));
+        for (var semester in semesters) {
+          _dropdownMenuItems.add(DropdownMenuItem(
+            child: Text(semester['semester_name']), 
+            value: semester['id'],
+          ));
+        }
+      });
+    });
+  }
+
+  void fetchroom() async {
+    List<Map<String, dynamic>> listofsemester = await firestoreService.fetchRooms();
+    ((List<Map<String, dynamic>> rooms) {
+      setState(() {
+        _dropdownMenuItems.add(DropdownMenuItem(child: Text('Select a Room'), value: null));
+        for (var room in rooms) {
+          _dropdownMenuItems.add(DropdownMenuItem(
+            child: Text(room['room_name']),
+            value: room['room_id'],
+          ));
+        }
+      });
+    });
+  }
+
+  String? _selectedSemester;
+  String? _selectedRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +153,67 @@ class _HomePageState extends State<AddRoomSchedule> {
                 ),
               ),
               SizedBox(height: 15,),
-              TextField(
-                controller: roomCode,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.blue
-                    ),
-                  ),
-                  hintText: 'Enter Room Code',
-                  prefixIcon: Icon(Icons.meeting_room),
-                  suffixIcon: Icon(Icons.info),
-                ),
+              FutureBuilder<List<Map<String, dynamic>>>(
+              future: firestoreService.fetchRooms(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                   
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  
+                  List<Map<String, dynamic>> rooms = snapshot.data!;
+                  return DropdownButton<String>(
+                    hint: Text("Select a Room"),
+                    value: _selectedRoom,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedRoom = newValue;
+                      });
+                    },
+                    items: rooms.map((room) {
+                      return DropdownMenuItem(
+                        child: Text(room['room_name'].toString()),
+                        value: room['room_id'].toString(),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
               ),
+              FutureBuilder<List<Map<String, dynamic>>>(
+              future: firestoreService.fetchSemester(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                   
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                 
+                  return Text('Error: ${snapshot.error}');
+                } else {
+               
+                  List<Map<String, dynamic>> semesters = snapshot.data!;
+                  return DropdownButton<String>(
+                    hint: Text("Select a Semester"),
+                    value: _selectedSemester,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedSemester = newValue;
+                      });
+                    },
+                    items: semesters.map((semester) {
+                      return DropdownMenuItem(
+                        child: Text(semester['semester_name'].toString()),
+                        value: semester['id'].toString(),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
+              ),
+
               SizedBox(height: 15,),
               MultiSelectDropDown(
                 controller: selecteddayoftheweek,
@@ -191,7 +275,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                   const SizedBox(width: 10,),
                   const Text("To"),
                   const SizedBox(width: 10,),
-                  // End Time Dropdown with disabled na time if selected na
+               
                   DropdownButton<int>(
                     value: selectedValueEnd,
                     items: timeSchedValue.map((int value) {
@@ -225,10 +309,11 @@ class _HomePageState extends State<AddRoomSchedule> {
                     classCode.text,
                     courseCode.text,
                     instructor.text,
-                    roomCode.text,
+                    _selectedRoom!,
                     selectedValueStart,
                     selectedValueEnd,
                     selectedDays,
+                    _selectedSemester!,
                   );
                 },
                 child: const Text('Add Schedule'),
@@ -251,4 +336,5 @@ class _HomePageState extends State<AddRoomSchedule> {
     String period = value < 12 ? 'AM' : 'PM';
     return "${_formatTime(value)} $period";
   }
+  
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emailjs/emailjs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_addschedule/services/firestore.dart';
@@ -22,6 +23,54 @@ class _ViewReservationsState extends State<ViewReservations> {
   }
   Future<void> updateStatustoRejected(String docId) async {
     await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 2});
+  }
+
+  Future<void> sendEmailApprove(String name, String room_name, String status, String email) async {
+    Map<String, dynamic> templateParams = {
+      'student': name,
+      'room': room_name,
+      'status': "APPROVED",
+      'recipient': email,
+    };
+
+    try {
+      await EmailJS.send(
+        'service_3ca0m4k',
+        'template_cu85d3d',
+        templateParams,
+        const Options(
+          publicKey: 'JdeXxH2HpzwOpFZ_x',
+          privateKey: '57Qs_qxxVbgTpvCI9HFOP',
+        ),
+      );
+      print('SUCCESS TO SEND APPROVAL!');
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  Future<void> sendEmailDisapprove(String name, String room_name, String status, String email) async {
+    Map<String, dynamic> templateParams = {
+      'student': name,
+      'room': room_name,
+      'status': "DISAPPROVED",
+      'recipient': email,
+    };
+
+    try {
+      await EmailJS.send(
+        'service_3ca0m4k',
+        'template_cu85d3d',
+        templateParams,
+        const Options(
+          publicKey: 'JdeXxH2HpzwOpFZ_x',
+          privateKey: '57Qs_qxxVbgTpvCI9HFOP',
+        ),
+      );
+      print('SUCCESS TO SEND DISAPPROVAL!');
+    } catch (error) {
+      print(error.toString());
+    }
   }
     
   @override
@@ -169,6 +218,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                             ),
                             onPressed: () {
                               updateStatus(item.id);
+                              sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString() );
                             },
                             child: Icon(Icons.check, color: Colors.white),
                           ),
@@ -181,6 +231,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                             ),
                             onPressed: () {
                               updateStatustoRejected(item.id);
+                              sendEmailDisapprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString() );
                             },
                             child: Icon(Icons.close, color: Colors.white),
                           ),

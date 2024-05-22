@@ -1,5 +1,6 @@
 import 'package:admin_addschedule/firebase_options.dart';
 import 'package:admin_addschedule/pages/addRoomSchedule.dart';
+import 'package:admin_addschedule/pages/addSemester.dart';
 import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
@@ -77,6 +78,8 @@ class SidebarXExampleApp extends StatelessWidget {
       return 'View Disapproved Reservation';
       case 3:
         return 'Add Schedule';
+      case 4:
+        return 'Add Semester';
       default:
         return 'Page Not Found';
     }
@@ -187,6 +190,15 @@ class ExampleSidebarX extends StatelessWidget {
             _controller.selectIndex(3);
           },
         ),
+
+        SidebarXItem(
+          icon: Icons.schedule,
+          label: 'Add Semester',
+          onTap: () {
+            _controller.selectIndex(4);
+          },
+        ),
+
         SidebarXItem(
           icon: Icons.logout,
           label: 'Sign out',
@@ -241,6 +253,8 @@ class _ScreensExample extends StatelessWidget {
         return ViewReservationsDisapproved();
       case 3:
         return AddRoomSchedule();
+      case 4:
+        return Semester();
       default:
         return SignIn();
     }
