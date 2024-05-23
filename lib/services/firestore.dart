@@ -56,6 +56,20 @@ class FirestoreService {
     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
   }
 
+  Future<List<Map<String, dynamic>>> fetchSchedule() async {
+    QuerySnapshot snapshot = await sched_details.get();
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSemesters() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('semester').get();
+    return snapshot.docs.map((doc) => {
+      'id': doc.id,
+      'semester_name': doc['semester_name']
+    }).toList();
+  }
+  
+
   Future<void> addSemester(DateTime end_date, String semester_name, DateTime start_date,){
     String documentID = sched_details.doc().id;
     
@@ -67,6 +81,7 @@ class FirestoreService {
       'date_created' : DateTime.now(),
     });
 
-  }
+  
 
+  }
 }
