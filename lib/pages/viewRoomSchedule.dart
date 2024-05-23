@@ -20,26 +20,25 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
   TextEditingController classController = TextEditingController(text: item['class'].toString());
   TextEditingController courseController = TextEditingController(text: item['course'].toString());
   TextEditingController instructorController = TextEditingController(text: item['instructor'].toString());
-  MultiSelectController selecteddayoftheweek = MultiSelectController();
   
   String? _selectedRoom = item['room_id'].toString();
-  List<String> selectedDays = item['weekday'].toString().split(','); 
+  String? _selectedDay = item['weekday'].toString(); 
   int selectedValueStart = int.tryParse(item['start_time'].toString()) ?? 6; 
   int selectedValueEnd = int.tryParse(item['end_time'].toString()) ?? 7; 
 
   List<int> timeSchedValue = <int>[6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-  List<ValueItem> dayoftheweek = const <ValueItem>[
-    ValueItem(label: 'monday', value: 'monday'),
-    ValueItem(label: 'tuesday', value: 'tuesday'),
-    ValueItem(label: 'wednesday', value: 'wednesday'),
-    ValueItem(label: 'thursday', value: 'thursday'),
-    ValueItem(label: 'friday', value: 'friday'),
-    ValueItem(label: 'saturday', value: 'saturday'),
-    ValueItem(label: 'sunday', value: 'sunday'),
+  List<String> daysOfTheWeek = <String>[
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
   ];
 
   void _updateTakenTimes() {
-  
+    
   }
 
   List<int> takenTimes = [];
@@ -96,26 +95,23 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
                   }
                 },
               ),
-              MultiSelectDropDown(
-                controller: selecteddayoftheweek,
-                onOptionSelected: (options) {
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  hintText: "Select a Day",
+                  border: OutlineInputBorder(),
+                ),
+                value: _selectedDay,
+                onChanged: (String? newValue) {
                   setState(() {
-                    selectedDays = options.cast<String>();
+                    _selectedDay = newValue;
                   });
                 },
-                inputDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(color: Colors.grey),
-                ),
-                hint: 'Select the day of the week.',
-                hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
-                options: dayoftheweek,
-                maxItems: 7,
-                selectionType: SelectionType.multi,
-                chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                dropdownHeight: 300,
-                optionTextStyle: const TextStyle(fontSize: 16),
-                selectedOptionIcon: const Icon(Icons.check_circle),
+                items: daysOfTheWeek.map((String day) {
+                  return DropdownMenuItem<String>(
+                    value: day,
+                    child: Text(day[0].toUpperCase() + day.substring(1).toLowerCase()),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 15),
               Row(
@@ -196,7 +192,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
                     'room_id': _selectedRoom,
                     'start_time': selectedValueStart.toString(),
                     'end_time': selectedValueEnd.toString(),
-                    'weekday': selectedDays.join(','), 
+                    'weekday': _selectedDay, 
                   })
                   .then((_) {
                     print('Update successful for item: ${item.id}');

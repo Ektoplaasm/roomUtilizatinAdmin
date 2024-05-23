@@ -106,7 +106,7 @@ class _SemesterState extends State<Semester> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(

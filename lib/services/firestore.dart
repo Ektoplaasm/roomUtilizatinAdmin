@@ -23,7 +23,10 @@ class FirestoreService {
       'weekday' : selectedDay,
       'semester_id' : _selectedSemester,
       'sched_id' : documentID,
-    });
+      
+    }
+    
+    );
 
   }
 
