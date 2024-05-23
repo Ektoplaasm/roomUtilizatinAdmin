@@ -13,6 +13,8 @@ class AddRoomSchedule extends StatefulWidget {
 }
 
 class _HomePageState extends State<AddRoomSchedule> {
+  final formKey = new GlobalKey<FormState>();
+
   List<DropdownMenuItem<String>> _dropdownMenuItems = [];
   List<int> timeSchedValue = <int>[
     6, 7, 8, 9, 10, 11, 12,
@@ -116,7 +118,11 @@ class _HomePageState extends State<AddRoomSchedule> {
             ],
           ),
         )),
-      body: SingleChildScrollView(
+      body: 
+      Form(
+      key: formKey,
+      child: 
+      SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Container(
           margin: EdgeInsets.only(top: 10, left: 300, right: 300),
@@ -379,8 +385,10 @@ class _HomePageState extends State<AddRoomSchedule> {
                 ],
               ),
               SizedBox(height: 15,),
-              
-              ElevatedButton(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                ElevatedButton(
                 onPressed: () {
                   firestoreService.addSched(
                     classCode.text,
@@ -397,10 +405,32 @@ class _HomePageState extends State<AddRoomSchedule> {
                 },
                 child: const Text('Add Schedule'),
               ),
+              const SizedBox(width: 20),
+
+              ElevatedButton(onPressed: (){
+                formKey.currentState!.reset();
+                classCode.clear();
+                courseCode.clear();
+                instructor.clear();
+                _selectedRoom = null;
+                _selectedDay = null;
+                _selectedSemester = null;
+                takenTimes = [];
+                selectedValueStart = 6;
+                selectedValueEnd = 6;
+                
+              }, child: const Text('Clear Form'))
+              ],)
+              
+              
+              
             ],
           ),
         ),
       ),
+
+      )
+      
     );
   }
 
