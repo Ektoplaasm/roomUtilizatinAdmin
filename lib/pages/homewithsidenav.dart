@@ -1,6 +1,7 @@
 import 'package:admin_addschedule/firebase_options.dart';
 import 'package:admin_addschedule/pages/addRoomSchedule.dart';
 import 'package:admin_addschedule/pages/addSemester.dart';
+import 'package:admin_addschedule/pages/signin%20copy.dart';
 import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
@@ -9,6 +10,7 @@ import 'package:admin_addschedule/pages/viewRoomSchedule.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 class SidebarXExampleApp extends StatelessWidget {
@@ -17,8 +19,11 @@ class SidebarXExampleApp extends StatelessWidget {
   final _controller = SidebarXController(selectedIndex: 0, extended: true);
   final _key = GlobalKey<ScaffoldState>();
 
+  
+
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'CISC Room Utilization',
       debugShowCheckedModeBanner: false,
@@ -72,11 +77,11 @@ class SidebarXExampleApp extends StatelessWidget {
   String _getTitleByIndex(int index) {
     switch (index) {
       case 0:
-        return 'View Pending Reservation';
+        return 'View Pending';
       case 1:
-        return 'View Approved Reservation';
+        return 'View Approved';
       case 2:
-        return 'View Disapproved Reservation';
+        return 'View Disapproved';
       case 3:
         return 'Schedules';
       case 4:
@@ -106,29 +111,30 @@ class ExampleSidebarX extends StatelessWidget {
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: canvasColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
         ),
         hoverColor: hovercolormain,
-        textStyle: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-        selectedTextStyle: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        textStyle: TextStyle(color: const Color.fromARGB(255, 102, 102, 102), fontSize: 15),
+        selectedTextStyle: const TextStyle(color: primaryColor, fontSize: 15, fontWeight: FontWeight.w700),
         hoverTextStyle: const TextStyle(
-          color: Color.fromARGB(255, 0, 0, 0),
-          fontWeight: FontWeight.w500,
+          color: primaryColor,
+          fontWeight: FontWeight.w700,
         ),
-        itemTextPadding: const EdgeInsets.only(left: 30),
+        itemTextPadding: const EdgeInsets.only(left: 30,),
         selectedItemTextPadding: const EdgeInsets.only(left: 30),
         itemDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: canvasColor),
         ),
         selectedItemDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: actionColor.withOpacity(0.37),
-          ),
-          gradient: const LinearGradient(
-            colors: [accentCanvasColor, gradient2nd],
-          ),
+          color: hovercolormain,
+          // border: Border.all(
+          //   color: actionColor.withOpacity(0.37),
+          // ),
+          // gradient: const (
+          //   colors: [accentCanvasColor],
+          // ),
           // boxShadow: [
           //   BoxShadow(
           //     color: Colors.black.withOpacity(0.28),
@@ -138,18 +144,21 @@ class ExampleSidebarX extends StatelessWidget {
           
         ),
         iconTheme: IconThemeData(
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.7),
-          size: 20,
+          color: const Color.fromARGB(255, 102, 102, 102),
+          size: 30,
         ),
         selectedIconTheme: const IconThemeData(
-          color: Color.fromARGB(255, 0, 0, 0),
-          size: 20,
+          color: primaryColor,
+          size: 30,
         ),
       ),
       extendedTheme: const SidebarXTheme(
-        width: 200,
+        width: 290,
         decoration: BoxDecoration(
           color: canvasColor,
+          border: Border(right: BorderSide(
+            width: 0.3,
+          )),
         ),
       ),
       footerDivider: divider,
@@ -158,30 +167,51 @@ class ExampleSidebarX extends StatelessWidget {
           height: 200,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Image.asset('assets/logo.png'),
+            // child: Image.asset('assets/logo.png'),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  PhosphorIcon(PhosphorIconsFill.chalkboardTeacher, size: 30),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        "CISC Room Utilization",
+                        style: TextStyle(
+                          fontSize: 20,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
       items: [
        SidebarXItem(
           icon: Icons.view_agenda,
-          label: 'View Pending Reservations',
+          label: 'View Pending',
           onTap: () {
             _controller.selectIndex(0);
           },
         ),
 
         SidebarXItem(
-          icon: Icons.view_agenda,
-          label: 'View Approved Reservations',
+          icon: PhosphorIconsFill.calendarCheck,
+          label: 'View Approved',
           onTap: () {
             _controller.selectIndex(1);
           },
         ),
 
         SidebarXItem(
-          icon: Icons.view_agenda,
-          label: 'View Disapproved Reservations',
+          icon: PhosphorIconsFill.calendarSlash,
+          label: 'View Disapproved',
           onTap: () {
             _controller.selectIndex(2);
           },
@@ -204,7 +234,7 @@ class ExampleSidebarX extends StatelessWidget {
         ),
 
         SidebarXItem(
-          icon: Icons.schedule,
+          icon: Icons.date_range,
           label: 'Add Semester',
           onTap: () {
             _controller.selectIndex(5);
@@ -216,25 +246,13 @@ class ExampleSidebarX extends StatelessWidget {
           label: 'Sign out',
           onTap: () async {
             await FirebaseAuth.instance.signOut();
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignIn()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignIn2()));
           },
         ),
 
       ],
     );
-  }
-
-  void _showDisabledAlert(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Item disabled for selecting',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-      ),
-    );
-  }
+  } 
 }
 
 class _ScreensExample extends StatelessWidget {
@@ -276,16 +294,11 @@ class _ScreensExample extends StatelessWidget {
 }
 
 const primaryColor = Color(0xff274c77);
-const canvasColor = Color.fromARGB(255, 255, 255, 255);
-const gradient2nd = Color(0xff274c77);
+const canvasColor = Color(0xfff0f4f9);
+// const gradient2nd = Color(0xff274c77);
 const scaffoldBackgroundColor = Color(0xfff0f4f9);
 const accentCanvasColor = Color(0xff274c77);
 const white = Color.fromARGB(255, 188, 188, 188);
-final actionColor = Color.fromARGB(255, 55, 55, 126).withOpacity(0.6);
-final divider = Divider(color: white.withOpacity(0.3), height: 1);
-const hovercolormain = Color.fromARGB(255, 162, 162, 162);
-// const Color primaryColor = Color(0xff274c77);
-// const Color secondaryColor = Color(0xff4f749f);
-// const Color bgColor = Color(0xfff0f4f9);
-// const Color outlineColor = Color(0xffE4E4E4);
-// const Color highlightColor = Color(0xffF8FDFF);
+final actionColor = Color.fromARGB(255, 55, 55, 126);
+final divider = Divider(color: white.withOpacity(0.3));
+const hovercolormain = Color.fromARGB(255, 231, 236, 248);
