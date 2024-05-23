@@ -264,7 +264,7 @@ class _SignIn2State extends State<SignIn2> {
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Image.asset('logo-white.png'),
+                              child: Image.asset('assets/logo-white.png'),
                             ),
                             const Text(
                               'Schedule your room usage with registrar directly through CISC Room Utilization',
