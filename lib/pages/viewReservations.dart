@@ -3,6 +3,7 @@ import 'package:emailjs/emailjs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_addschedule/services/firestore.dart';
+import 'package:intl/intl.dart';
 
 class ViewReservations extends StatefulWidget {
   const ViewReservations({super.key});
@@ -25,12 +26,14 @@ class _ViewReservationsState extends State<ViewReservations> {
     await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 2});
   }
 
-  Future<void> sendEmailApprove(String name, String room_name, String status, String email) async {
+  Future<void> sendEmailApprove(String name, String room_name, String status, String email, String date) async {
     Map<String, dynamic> templateParams = {
       'student': name,
       'room': room_name,
       'status': "APPROVED",
       'recipient': email,
+      'reason' : 'OK',
+      'date' : date,
     };
 
     try {
@@ -49,12 +52,14 @@ class _ViewReservationsState extends State<ViewReservations> {
     }
   }
 
-  Future<void> sendEmailDisapprove(String name, String room_name, String status, String email) async {
+  Future<void> sendEmailDisapprove(String name, String room_name, String status, String email, String reason, String date) async {
     Map<String, dynamic> templateParams = {
       'student': name,
       'room': room_name,
       'status': "DISAPPROVED",
       'recipient': email,
+      'reason' : reason,
+      'date' : date,
     };
 
     try {
@@ -72,6 +77,8 @@ class _ViewReservationsState extends State<ViewReservations> {
       print(error.toString());
     }
   }
+
+  TextEditingController reasonController = TextEditingController();
     
   @override
   Widget build(BuildContext context) {
@@ -206,34 +213,133 @@ class _ViewReservationsState extends State<ViewReservations> {
                   DataCell(Center(child: Text(item['room_id'].toString()))),
                   DataCell(Center(child: Text(displayStringStart))),
                   DataCell(Center(child: Text(displayStringEnd))),
-                  DataCell(Center(child: Text(item['reason'].toString()))),
-                  DataCell(Center(child: statusWidget)),
                   DataCell(
                     Row(
                       children: [
                         Center(
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(Colors.green),
+                              backgroundColor: WidgetStateProperty.all(Color(0xff274c77)),
                             ),
-                            onPressed: () {
-                              updateStatus(item.id);
-                              sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString() );
-                            },
-                            child: Icon(Icons.check, color: Colors.white),
+                            onPressed: () => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                              AlertDialog(
+                              title: Text("Room Utilization Request", style: TextStyle(fontSize: 20)),
+                              content: SingleChildScrollView(
+                                child: 
+                                SizedBox(
+                                width: 600,
+                                child: 
+                                ListBody(
+                                  children: <Widget>[
+                                    Text(item['name'].toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    Divider(
+                                      color: Colors.black
+                                    ),
+                                    Row(children: [
+                                      const Text("Email: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      Text(item['email'].toString()),
+                                    ]),
+                                    Row(children: [
+                                      const Text("Room: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      Text(item['room_id'].toString()),
+                                    ]),
+                                    
+                                    Row(children: [
+                                      const Text("Time Requested: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      Text(displayStringStart),
+                                      const Text(' to '),
+                                      Text(displayStringEnd),
+                                    ]),
+                                    const SizedBox(height: 5,),
+                                    const Text('Reason for request:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 5,),
+                                    Expanded(child: SingleChildScrollView( // Wrap the Text widget with SingleChildScrollView
+                                      child: Text(item['reason'].toString(), textAlign: TextAlign.justify,),
+                                    )),
+                                    
+                                    
+                                  ],
+                                )
+                                )
+                                
+                                )
+                                )
+                                )
+                            ,
+                            child: const Text('View', style: TextStyle(color: Colors.white),),
                           ),
                         ),
-                        
                         Center(
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(Color.fromARGB(255, 255, 0, 0)),
+                              backgroundColor: WidgetStateProperty.all(Colors.green),
                             ),
-                            onPressed: () {
-                              updateStatustoRejected(item.id);
-                              sendEmailDisapprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString() );
-                            },
-                            child: Icon(Icons.close, color: Colors.white),
+                            // updateStatus(item.id);
+                              // sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString() );
+                            onPressed: ()  => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                              AlertDialog(
+                              title: Text("Confirm Approval of Request?", style: TextStyle(fontSize: 20)),
+                              content: SingleChildScrollView(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(onPressed: (){
+                                      updateStatus(item.id);
+                                      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
+                                      sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString(), DateFormat('MMMM d, yyyy').format(dateTime));
+                                      Navigator.of(context).pop();
+                                    }, child: Text('Confirm')),
+                                    ElevatedButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Cancel')),
+                                  ],
+                                ),
+                              )
+                              )),
+                            child: const Icon(Icons.check, color: Colors.white),
+                          ),
+                        ),
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.red),
+                            ),
+                            onPressed: ()  => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                              AlertDialog(
+                              title: Text("Reject Room Utilization", style: TextStyle(fontSize: 20)),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: [
+                                    
+                                    Expanded(
+                                      child: TextField(
+                                        controller: reasonController,
+                                        decoration: InputDecoration(labelText: 'Enter Reason for Rejection.'),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                      ElevatedButton(onPressed: (){
+                                      updateStatustoRejected(item.id);
+                                      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
+                                      sendEmailDisapprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString(), reasonController.text, DateFormat('MMMM d, yyyy').format(dateTime));
+                                      Navigator.of(context).pop();
+                                    }, child: const Text('Confirm')),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Cancel')),
+                                    ],)
+                                    
+                                  ],
+                                ),
+                              )
+                              )),
+                            child: const Icon(Icons.close, color: Colors.white),
                           ),
                         ),
                       ],
@@ -259,8 +365,6 @@ class _ViewReservationsState extends State<ViewReservations> {
                           DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
                           DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
                           DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                          DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                          DataColumn(label: Expanded(child: Center(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
                           DataColumn(label: Expanded(child: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
                         ],
                         rows: rows.map((row) {
