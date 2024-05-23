@@ -1,5 +1,6 @@
 import 'package:admin_addschedule/pages/addRoomSchedule.dart';
 import 'package:admin_addschedule/pages/homewithsidenav.dart';
+import 'package:admin_addschedule/pages/signin%20copy.dart';
 import 'package:admin_addschedule/pages/signin.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
@@ -22,7 +23,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignIn(),
+      home: SignIn2(),
     );
   }
 }

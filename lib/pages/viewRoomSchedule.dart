@@ -37,7 +37,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
     'sunday',
   ];
 
-  List<int> takenTimes = []; // Initialize taken times if needed
+  List<int> takenTimes = [];
 
   showDialog(
     context: context,
@@ -133,7 +133,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
                           if (newValue != null && !takenTimes.contains(newValue)) {
                             setState(() {
                               selectedValueStart = newValue;
-                              selectedValueEnd = newValue + 1; // Adjust the end time accordingly
+                              selectedValueEnd = newValue + 1; 
                             });
                           }
                         },
