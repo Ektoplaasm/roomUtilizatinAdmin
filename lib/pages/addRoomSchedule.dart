@@ -1,3 +1,4 @@
+import 'package:admin_addschedule/themes/colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
@@ -306,7 +307,7 @@ class _HomePageState extends State<AddRoomSchedule> {
               SizedBox(height: 15,),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   DropdownButton<int>(
                     value: selectedValueStart,
@@ -344,7 +345,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                     },
                   ),
                   const SizedBox(width: 10,),
-                  const Text("To"),
+                  const Text("To", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
                   const SizedBox(width: 10,),
                
                   DropdownButton<int>(
@@ -386,7 +387,7 @@ class _HomePageState extends State<AddRoomSchedule> {
               ),
               SizedBox(height: 15,),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                 ElevatedButton(
                 onPressed: () {
@@ -403,7 +404,13 @@ class _HomePageState extends State<AddRoomSchedule> {
                   );
                   
                 },
-                child: const Text('Add Schedule'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)
+                  )
+                ),
+                child: const Text('Add Schedule',style: TextStyle(color: Colors.white),),
               ),
               const SizedBox(width: 20),
 
@@ -419,7 +426,14 @@ class _HomePageState extends State<AddRoomSchedule> {
                 selectedValueStart = 6;
                 selectedValueEnd = 6;
                 
-              }, child: const Text('Clear Form'))
+              }, 
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)
+                )
+              ),
+              child: const Text('Clear Form', style: TextStyle(color: Colors.white),))
               ],)
               
               

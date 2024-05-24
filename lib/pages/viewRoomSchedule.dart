@@ -1,8 +1,10 @@
 import 'package:admin_addschedule/services/firestore.dart';
+import 'package:admin_addschedule/themes/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class ViewRoomSchedule extends StatefulWidget {
   const ViewRoomSchedule({super.key});
@@ -279,6 +281,8 @@ Future<void> _loadWeekdays() async {
   });
 }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -327,33 +331,75 @@ Future<void> _loadWeekdays() async {
       ),
 
       body: StreamBuilder<QuerySnapshot>(
-        stream: (_selectedSemester == 'all' && _selectedWeekday == 'all')
-    ? FirebaseFirestore.instance.collection('schedule_details').snapshots()
-    : (_selectedSemester == 'all')
-        ? FirebaseFirestore.instance.collection('schedule_details')
-            .where('weekday', isEqualTo: _selectedWeekday)
-            .snapshots()
-        : (_selectedWeekday == 'all')
+        stream: (_selectedSemester == null || _selectedWeekday == null || _selectedSemester == 'all' && _selectedWeekday == 'all')
+          ? FirebaseFirestore.instance.collection('schedule_details').orderBy('start_time').snapshots()
+          : (_selectedSemester == 'all')
             ? FirebaseFirestore.instance.collection('schedule_details')
-                .where('semester_id', isEqualTo: _selectedSemester)
-                .snapshots()
-            : FirebaseFirestore.instance.collection('schedule_details')
-                .where('semester_id', isEqualTo: _selectedSemester)
                 .where('weekday', isEqualTo: _selectedWeekday)
-                .snapshots(),
+                .snapshots()
+            : (_selectedWeekday == 'all')
+              ? FirebaseFirestore.instance.collection('schedule_details')
+                  .where('semester_id', isEqualTo: _selectedSemester)
+                  .snapshots()
+              : FirebaseFirestore.instance.collection('schedule_details')
+                  .where('semester_id', isEqualTo: _selectedSemester)
+                  .where('weekday', isEqualTo: _selectedWeekday)
+                  .snapshots(),
+
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<DataCell> displayedDataCell = [];
             List<DataRow> rows = [];
 
+            for (var item in snapshot.data!.docs){
+                // Formatting Time
+                var displayStringStart = item['start_time'].toString();
+                if(displayStringStart == '13'){
+                  displayStringStart = '1 PM';
+                } else if(displayStringStart == '14'){
+                  displayStringStart = '2 PM';
+                } else if(displayStringStart == '15'){
+                  displayStringStart = '3 PM';
+                } else if(displayStringStart == '16'){
+                  displayStringStart = '4 PM';
+                } else if(displayStringStart == '17'){
+                  displayStringStart = '5 PM';
+                } else if(displayStringStart == '18'){
+                  displayStringStart = '6 PM';
+                } else if(displayStringStart == '19'){
+                  displayStringStart = '7 PM';
+                } else {
+                  displayStringStart = "${item['start_time'].toString()} AM";
+                }
+                // End Time
+                var displayStringEnd = item['end_time'].toString();
+                if(displayStringEnd == '13'){
+                  displayStringEnd = '1 PM';
+                } else if(displayStringEnd == '14'){
+                  displayStringEnd = '2 PM';
+                } else if(displayStringEnd == '15'){
+                  displayStringEnd = '3 PM';
+                } else if(displayStringEnd == '16'){
+                  displayStringEnd = '4 PM';
+                } else if(displayStringEnd == '17'){
+                  displayStringEnd = '5 PM';
+                } else if(displayStringEnd == '18'){
+                  displayStringEnd = '6 PM';
+                } else if(displayStringEnd == '19'){
+                  displayStringEnd = '7 PM';
+                } else {displayStringEnd = "${item['end_time'].toString()} AM";}
+
             for (var item in snapshot.data!.docs) {
+
+            }
+
               displayedDataCell = [
                 DataCell(Center(child: Text(item['class'].toString()))),
                 DataCell(Center(child: Text(item['course'].toString()))),
                 DataCell(Center(child: Text(item['instructor'].toString()))),
                 DataCell(Center(child: Text(item['room_id'].toString()))),
-                DataCell(Center(child: Text(item['start_time'].toString()))),
-                DataCell(Center(child: Text(item['end_time'].toString()))),
+                DataCell(Center(child: Text(displayStringStart))),
+                DataCell(Center(child: Text(displayStringEnd))),
                 DataCell(Center(child: Text(item['weekday'].toString()))),
                 DataCell(
                   Row(
@@ -385,18 +431,59 @@ Future<void> _loadWeekdays() async {
                     alignment: Alignment.center,
                     child: DataTable(
                       columns: const <DataColumn>[
-                        DataColumn(label: Expanded(child: Center(child: Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Day of the Week', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                        DataColumn(label: Expanded(child: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.chalkboard),
+                            Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.graduationCap),
+                            Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            Icon(Icons.badge),
+                            Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
+                            Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.hourglassHigh),
+                            Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.hourglassLow),
+                            Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.calendarBlank),
+                            Text('Day of the Week', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
+                        DataColumn(label: Expanded(child: Center(child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.gearSix),
+                            Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ],
+                        )))),
                       ],
                       rows: rows.map((row) {
                         final rowIndex = rows.indexOf(row);
-                        final color = rowIndex.isEven ? Colors.grey[200] : Colors.white;
+                        final color = rowIndex.isEven ? bgColor : Colors.white;
                         return DataRow(
                           color: MaterialStateColor.resolveWith((states) => color!),
                           cells: row.cells,

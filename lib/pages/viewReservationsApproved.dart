@@ -1,8 +1,11 @@
 
+import 'package:admin_addschedule/themes/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_addschedule/services/firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class ViewReservationsApproved extends StatefulWidget {
   const ViewReservationsApproved({super.key});
@@ -152,15 +155,19 @@ class _ViewReservationsApprovedState extends State<ViewReservationsApproved> {
                 ),
               );
 
+              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
+              String formattedDate = DateFormat('MMMM d, yyyy').format(dateTime);
+
               
                 displayedDataCell = [
                   DataCell(Center(child: Text(item['id'].toString()))),
                   DataCell(Center(child: Text(item['name'].toString()))),
                   DataCell(Center(child: Text(item['email'].toString()))),
                   DataCell(Center(child: Text(item['room_id'].toString()))),
+                  DataCell(Center(child: Text(formattedDate))),
                   DataCell(Center(child: Text(displayStringStart))),
                   DataCell(Center(child: Text(displayStringEnd))),
-                  DataCell(Center(child: Text(item['reason'].toString()))),
+                  // DataCell(Center(child: Text(item['reason'].toString()))),
                   DataCell(Center(child: statusWidget)),
                   
                 ];
@@ -173,18 +180,54 @@ class _ViewReservationsApprovedState extends State<ViewReservationsApproved> {
                   alignment: Alignment.center,
                   child: DataTable(
                     columns: const <DataColumn>[
-                      DataColumn(label: Expanded(child: Center(child: Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Row(
+                        children: [
+                          PhosphorIcon(PhosphorIconsFill.identificationBadge),
+                          Text('Student ID', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                        ],
+                      )))),
                       DataColumn(label: Expanded(child: Center(child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
-                      DataColumn(label: Expanded(child: Center(child: Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          PhosphorIcon(PhosphorIconsFill.at),
+                          Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                        ],
+                      )))),
+                     DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.chalkboard),
+                                Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.calendarDot),
+                                Text('Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.hourglassHigh),
+                                Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.hourglassLow),
+                                Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),// DataColumn(label: Expanded(child: Center(child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))),
+                      DataColumn(label: Expanded(child: Center(child: Row(
+                        children: [
+                          PhosphorIcon(PhosphorIconsFill.checkCircle),
+                          Text('Reservation Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                        ],
+                      )))),
                       ],
                     rows: rows.map((row) {
                     final rowIndex = rows.indexOf(row);
-                    final color = rowIndex.isEven ? Colors.grey[200] : Colors.white;
+                    final color = rowIndex.isEven ? bgColor : Colors.white;
                     return DataRow(
                       color: WidgetStateColor.resolveWith((states) => color!),
                       cells: row.cells,
