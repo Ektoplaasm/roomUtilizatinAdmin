@@ -274,6 +274,23 @@ Future<void> _loadWeekdays() async {
     });
   }
 
+  Future<void> deleteSched(BuildContext context, String sched_id) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('schedule_details')
+        .doc(sched_id)
+        .delete();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Schedule deleted successfully')),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error deleting schedule: $e')),
+    );
+  }
+}
+
+
   Future<void> _loadallschedules() async {
   List<Map<String, dynamic>> schedules = await firestoreService.fetchSchedule();
   setState(() {
@@ -415,6 +432,53 @@ Future<void> _loadWeekdays() async {
                           child: const Icon(Icons.settings, color: Colors.white),
                         ),
                       ),
+                      SizedBox(width: 10,),
+                      Center(
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.red),
+                          ),
+                          onPressed: () {
+                            showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                AlertDialog(
+                                title: Text("Confirm Schedule Deletion?", style: TextStyle(fontSize: 20)),
+                                content: SingleChildScrollView(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      ElevatedButton(onPressed: (){
+                                        deleteSched(context, item['sched_id']);
+                                      }, 
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xff274c77),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                        )
+                                      ),
+                                      child: Text('Confirm', style: TextStyle(
+                                          color: Colors.white,
+                                        ),)),
+                                      SizedBox(width: 10,),
+                                      ElevatedButton(onPressed: (){Navigator.of(context).pop();},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xff274c77),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                        )
+                                      ), child: Text('Cancel',style: TextStyle(
+                                          color: Colors.white,))),
+                                    ],
+                                  ),
+                                )
+                              )
+                            );
+                            
+                          },
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -423,72 +487,74 @@ Future<void> _loadWeekdays() async {
               rows.add(DataRow(cells: displayedDataCell));
             }
 
-            return Container(
-              alignment: Alignment.topCenter,
-              child: FittedBox(
-                child: Center(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: DataTable(
-                      columns: const <DataColumn>[
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.chalkboard),
-                            Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.graduationCap),
-                            Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            Icon(Icons.badge),
-                            Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
-                            Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.hourglassHigh),
-                            Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.hourglassLow),
-                            Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.calendarBlank),
-                            Text('Day of the Week', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                        DataColumn(label: Expanded(child: Center(child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PhosphorIcon(PhosphorIconsFill.gearSix),
-                            Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                          ],
-                        )))),
-                      ],
-                      rows: rows.map((row) {
-                        final rowIndex = rows.indexOf(row);
-                        final color = rowIndex.isEven ? bgColor : Colors.white;
-                        return DataRow(
-                          color: MaterialStateColor.resolveWith((states) => color!),
-                          cells: row.cells,
-                        );
-                      }).toList(),
+            return SingleChildScrollView(
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: FittedBox(
+                  child: Center(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: DataTable(
+                        columns: const <DataColumn>[
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.chalkboard),
+                              Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.graduationCap),
+                              Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              Icon(Icons.badge),
+                              Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
+                              Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.hourglassHigh),
+                              Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.hourglassLow),
+                              Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.calendarBlank),
+                              Text('Day of the Week', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                          DataColumn(label: Expanded(child: Center(child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PhosphorIcon(PhosphorIconsFill.gearSix),
+                              Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            ],
+                          )))),
+                        ],
+                        rows: rows.map((row) {
+                          final rowIndex = rows.indexOf(row);
+                          final color = rowIndex.isEven ? bgColor : Colors.white;
+                          return DataRow(
+                            color: MaterialStateColor.resolveWith((states) => color!),
+                            cells: row.cells,
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),

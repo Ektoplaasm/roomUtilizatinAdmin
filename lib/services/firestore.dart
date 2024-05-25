@@ -46,6 +46,10 @@ class FirestoreService {
     return FirebaseFirestore.instance.collection("users").doc(userId).set(userInfoMap);
   }
 
+  Future<void> deleteSched(String sched_id, Map<String, dynamic> userInfoMap) async {
+  await FirebaseFirestore.instance.collection("schedule_details").doc(sched_id).delete();
+  }
+
   Future<List<Map<String, dynamic>>> fetchRooms() async {
     QuerySnapshot snapshot = await listofrooms.get();
     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
@@ -70,7 +74,7 @@ class FirestoreService {
   }
   
 
-  Future<void> addSemester(DateTime end_date, String semester_name, DateTime start_date,){
+  Future<void> addSemester(DateTime start_date, String semester_name, DateTime end_date,){
     String documentID = sched_details.doc().id;
     
     return listofsemester.doc(documentID).set({

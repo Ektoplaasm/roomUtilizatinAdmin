@@ -102,6 +102,8 @@ class _HomePageState extends State<AddRoomSchedule> {
   String? _selectedSemester;
   String? _selectedRoom;
   String? _selectedDay;
+  List liststart = [];
+  List listEnd = [];
 
   @override
   Widget build(BuildContext context) {
@@ -313,16 +315,16 @@ class _HomePageState extends State<AddRoomSchedule> {
                     value: selectedValueStart,
                     items: timeSchedValue.map((int value) {
 
-                      List list = [];
+                      // List _list = [];
                       if(takenTimes.isNotEmpty){
                       var pairs = partition(takenTimes, 2);
                       for(List<int> pair in pairs){
-                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
-                        list.addAll(timeSlots);
+                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)), (i) => pair.elementAt(1)-(i+1));
+                        liststart.addAll(timeSlots);
                         // print(list); 
                       } 
                       }
-                      bool isDisabled = list.contains(value);
+                      bool isDisabled = liststart.contains(value);
 
 
                       var displayString = _formatTime(value);
@@ -337,7 +339,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      if (newValue != null && !takenTimes.contains(newValue)) {
+                      if (newValue != null && !liststart.contains(newValue)) {
                         setState(() {
                           selectedValueStart = newValue;
                         });
@@ -351,16 +353,16 @@ class _HomePageState extends State<AddRoomSchedule> {
                   DropdownButton<int>(
                     value: selectedValueEnd,
                     items: timeSchedValue.map((int value) {
-                      List list = [];
+                      // List list = [];
                       if(takenTimes.isNotEmpty){
                       var pairs = partition(takenTimes, 2);
                       for(List<int> pair in pairs){
-                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)-1), (i) => pair.elementAt(1)-i);
-                        list.addAll(timeSlots);
+                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)), (i) => pair.elementAt(1)-(i+1));
+                        listEnd.addAll(timeSlots);
                         // print(list); 
                       } 
                       }
-                      bool isDisabled = list.contains(value);
+                      bool isDisabled = listEnd.contains(value);
 
 
 
@@ -376,7 +378,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       );
                     }).toList(),
                     onChanged: (int? newValue) {
-                      if (newValue != null && !takenTimes.contains(newValue)) {
+                      if (newValue != null && !listEnd.contains(newValue)) {
                         setState(() {
                           selectedValueEnd = newValue;
                         });
