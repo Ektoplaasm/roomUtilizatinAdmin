@@ -17,7 +17,7 @@ class SignIn2 extends StatefulWidget {
 
 class _SignIn2State extends State<SignIn2> {
 
-  bool isRegister = true;
+  bool isRegister = false;
   final _form = GlobalKey<FormState>();
   bool showPassword = true;
 
