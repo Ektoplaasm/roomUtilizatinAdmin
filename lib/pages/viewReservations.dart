@@ -29,13 +29,13 @@ class _ViewReservationsState extends State<ViewReservations> {
     await FirebaseFirestore.instance.collection('reservations').doc(docId).update({'status': 2});
   }
 
-  Future<void> sendEmailApprove(String name, String room_name, String status, String email, String date) async {
+  Future<void> sendEmailApprove(String name, String room_name, String status, String email, String reason, String date) async {
     Map<String, dynamic> templateParams = {
       'student': name,
       'room': room_name,
       'status': "APPROVED",
       'recipient': email,
-      'reason' : 'OK',
+      'reason' : reason,
       'date' : date,
     };
 
@@ -358,13 +358,12 @@ class _ViewReservationsState extends State<ViewReservations> {
                                       )),
                                       
                                       
-                                    ],
+                                        ],
+                                      )
+                                    )
                                   )
-                                  )
-                                  
-                                  )
-                                  )
-                                  )
+                                )
+                              )
                               ,
                               child: const Text('View', style: TextStyle(color: Colors.white),),
                             ),
@@ -383,37 +382,49 @@ class _ViewReservationsState extends State<ViewReservations> {
                                 AlertDialog(
                                 title: Text("Confirm Approval of Request?", style: TextStyle(fontSize: 20)),
                                 content: SingleChildScrollView(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  child: ListBody(
                                     children: [
-                                      ElevatedButton(onPressed: (){
-                                        BoxDecoration(
-                                          color: Color(0xff274c77),
-                                          
-                                        );
-                                        updateStatus(item.id);
-                                        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
-                                        sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString(), DateFormat('MMMM d, yyyy').format(dateTime));
-                                        Navigator.of(context).pop();
-                                      }, 
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff274c77),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        )
+                                      Expanded(
+                                        child: TextField(
+                                          controller: reasonController,
+                                          decoration: InputDecoration(labelText: 'Enter Message for the Student.'),
+                                        ),
                                       ),
-                                      child: Text('Confirm', style: TextStyle(
-                                          color: Colors.white,
-                                        ),)),
-                                      SizedBox(width: 10,),
-                                      ElevatedButton(onPressed: (){Navigator.of(context).pop();},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff274c77),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        )
-                                      ), child: Text('Cancel',style: TextStyle(
-                                          color: Colors.white,))),
+                                      SizedBox(height: 10,),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          ElevatedButton(onPressed: (){
+                                            BoxDecoration(
+                                              color: Color(0xff274c77),
+                                              
+                                            );
+                                            updateStatus(item.id);
+                                            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
+                                            sendEmailApprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString(), reasonController.text, DateFormat('MMMM d, yyyy').format(dateTime));
+                                            reasonController.clear();
+                                            Navigator.of(context).pop();
+                                          }, 
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color(0xff274c77),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10)
+                                            )
+                                          ),
+                                          child: Text('Confirm', style: TextStyle(
+                                              color: Colors.white,
+                                            ),)),
+                                          SizedBox(width: 10,),
+                                          ElevatedButton(onPressed: (){Navigator.of(context).pop();},
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color(0xff274c77),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10)
+                                            )
+                                          ), child: Text('Cancel',style: TextStyle(
+                                              color: Colors.white,))),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 )
@@ -450,6 +461,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                                         updateStatustoRejected(item.id);
                                         DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
                                         sendEmailDisapprove(item['id'].toString(), item['room_id'].toString(), item['status'].toString(), item['email'].toString(), reasonController.text, DateFormat('MMMM d, yyyy').format(dateTime));
+                                        reasonController.clear();
                                         Navigator.of(context).pop();
                                       }, 
                                       style: ElevatedButton.styleFrom(
