@@ -298,273 +298,281 @@ Future<void> _loadWeekdays() async {
   });
 }
 
+TextEditingController _searchController = TextEditingController();
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        title: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.view_compact, color: Color.fromARGB(255, 0, 0, 0)),
-              const SizedBox(width: 10),
-              const Text("View Schedules", style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(width: 10),
-              DropdownButton<String>(
-                value: _selectedSemester,
-                hint: const Text('Select Semester'),
-                onChanged: _filterSchedules,
-                items: [
-                  DropdownMenuItem<String>(
-                    value: 'all',
-                    child: const Text('All'),
-                  ),
-                  ..._semesters.map((semester) {
-                    return DropdownMenuItem<String>(
-                      value: semester['id'],
-                      child: Text(semester['semester_name']),
-                    );
-                  }).toList(),
-                ],
-              ),
-              const SizedBox(width: 10),
-              DropdownButton<String>(
-                value: _selectedWeekday,
-                hint: const Text('Select Day'),
-                onChanged: _filterWeekdays,
-                items: _weekdays.map((weekday) {
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      title: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.view_compact, color: Color.fromARGB(255, 0, 0, 0)),
+            const SizedBox(width: 10),
+            const Text("View Schedules", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(width: 10),
+            DropdownButton<String>(
+              value: _selectedSemester,
+              hint: const Text('Select Semester'),
+              onChanged: _filterSchedules,
+              items: [
+                DropdownMenuItem<String>(
+                  value: 'all',
+                  child: const Text('All'),
+                ),
+                ..._semesters.map((semester) {
                   return DropdownMenuItem<String>(
-                    value: weekday['id'],
-                    child: Text(weekday['name']),
+                    value: semester['id'],
+                    child: Text(semester['semester_name']),
                   );
                 }).toList(),
-              ),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(width: 10),
+            DropdownButton<String>(
+              value: _selectedWeekday,
+              hint: const Text('Select Day'),
+              onChanged: _filterWeekdays,
+              items: _weekdays.map((weekday) {
+                return DropdownMenuItem<String>(
+                  value: weekday['id'],
+                  child: Text(weekday['name']),
+                );
+              }).toList(),
+            ),
+          ],
         ),
       ),
-
-      body: StreamBuilder<QuerySnapshot>(
-        stream: (_selectedSemester == null || _selectedWeekday == null || _selectedSemester == 'all' && _selectedWeekday == 'all')
-          ? FirebaseFirestore.instance.collection('schedule_details').orderBy('start_time').snapshots()
-          : (_selectedSemester == 'all')
-            ? FirebaseFirestore.instance.collection('schedule_details')
-                .where('weekday', isEqualTo: _selectedWeekday)
-                .snapshots()
-            : (_selectedWeekday == 'all')
-              ? FirebaseFirestore.instance.collection('schedule_details')
-                  .where('semester_id', isEqualTo: _selectedSemester)
-                  .snapshots()
-              : FirebaseFirestore.instance.collection('schedule_details')
-                  .where('semester_id', isEqualTo: _selectedSemester)
-                  .where('weekday', isEqualTo: _selectedWeekday)
-                  .snapshots(),
-
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<DataCell> displayedDataCell = [];
-            List<DataRow> rows = [];
-
-            for (var item in snapshot.data!.docs){
+    ),
+    body: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              labelText: 'Search by Instructor',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('schedule_details').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(child: Text('No schedules found'));
+              }
+          
+              var filteredDocs = snapshot.data!.docs;
+          
+              if (_selectedSemester != null && _selectedSemester != 'all') {
+                filteredDocs = filteredDocs.where((doc) => doc['semester_id'] == _selectedSemester).toList();
+              }
+          
+              if (_selectedWeekday != null && _selectedWeekday != 'all') {
+                filteredDocs = filteredDocs.where((doc) => doc['weekday'] == _selectedWeekday).toList();
+              }
+          
+              if (_searchController.text.isNotEmpty) {
+                filteredDocs = filteredDocs.where((doc) => doc['instructor'].toString().toLowerCase().contains(_searchController.text.toLowerCase())).toList();
+              }
+          
+              List<DataRow> rows = filteredDocs.map((item) {
                 // Formatting Time
                 var displayStringStart = item['start_time'].toString();
-                if(displayStringStart == '13'){
+                if (displayStringStart == '13') {
                   displayStringStart = '1 PM';
-                } else if(displayStringStart == '14'){
+                } else if (displayStringStart == '14') {
                   displayStringStart = '2 PM';
-                } else if(displayStringStart == '15'){
+                } else if (displayStringStart == '15') {
                   displayStringStart = '3 PM';
-                } else if(displayStringStart == '16'){
+                } else if (displayStringStart == '16') {
                   displayStringStart = '4 PM';
-                } else if(displayStringStart == '17'){
+                } else if (displayStringStart == '17') {
                   displayStringStart = '5 PM';
-                } else if(displayStringStart == '18'){
+                } else if (displayStringStart == '18') {
                   displayStringStart = '6 PM';
-                } else if(displayStringStart == '19'){
+                } else if (displayStringStart == '19') {
                   displayStringStart = '7 PM';
                 } else {
                   displayStringStart = "${item['start_time'].toString()} AM";
                 }
                 // End Time
                 var displayStringEnd = item['end_time'].toString();
-                if(displayStringEnd == '13'){
+                if (displayStringEnd == '13') {
                   displayStringEnd = '1 PM';
-                } else if(displayStringEnd == '14'){
+                } else if (displayStringEnd == '14') {
                   displayStringEnd = '2 PM';
-                } else if(displayStringEnd == '15'){
+                } else if (displayStringEnd == '15') {
                   displayStringEnd = '3 PM';
-                } else if(displayStringEnd == '16'){
+                } else if (displayStringEnd == '16') {
                   displayStringEnd = '4 PM';
-                } else if(displayStringEnd == '17'){
+                } else if (displayStringEnd == '17') {
                   displayStringEnd = '5 PM';
-                } else if(displayStringEnd == '18'){
+                } else if (displayStringEnd == '18') {
                   displayStringEnd = '6 PM';
-                } else if(displayStringEnd == '19'){
+                } else if (displayStringEnd == '19') {
                   displayStringEnd = '7 PM';
-                } else {displayStringEnd = "${item['end_time'].toString()} AM";}
-
-            for (var item in snapshot.data!.docs) {
-
-            }
-
-              displayedDataCell = [
-                DataCell(Center(child: Text(item['class'].toString()))),
-                DataCell(Center(child: Text(item['course'].toString()))),
-                DataCell(Center(child: Text(item['instructor'].toString()))),
-                DataCell(Center(child: Text(item['room_id'].toString()))),
-                DataCell(Center(child: Text(displayStringStart))),
-                DataCell(Center(child: Text(displayStringEnd))),
-                DataCell(Center(child: Text(item['weekday'].toString()))),
-                DataCell(
-                  Row(
-                    children: [
-                      Center(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 42, 92, 150)),
+                } else {
+                  displayStringEnd = "${item['end_time'].toString()} AM";
+                }
+          
+                return DataRow(cells: [
+                  DataCell(Center(child: Text(item['class'].toString()))),
+                  DataCell(Center(child: Text(item['course'].toString()))),
+                  DataCell(Center(child: Text(item['instructor'].toString()))),
+                  DataCell(Center(child: Text(item['room_id'].toString()))),
+                  DataCell(Center(child: Text(displayStringStart))),
+                  DataCell(Center(child: Text(displayStringEnd))),
+                  DataCell(Center(child: Text(item['weekday'].toString()))),
+                  DataCell(
+                    Row(
+                      children: [
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 42, 92, 150)),
+                            ),
+                            onPressed: () {
+                              _showEditDialog(item);
+                            },
+                            child: const Icon(Icons.settings, color: Colors.white),
                           ),
-                          onPressed: () {
-                            _showEditDialog(item);
-                          },
-                          child: const Icon(Icons.settings, color: Colors.white),
                         ),
-                      ),
-                      SizedBox(width: 10,),
-                      Center(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.red),
-                          ),
-                          onPressed: () {
-                            showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                AlertDialog(
-                                title: Text("Confirm Schedule Deletion?", style: TextStyle(fontSize: 20)),
-                                content: SingleChildScrollView(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton(onPressed: (){
-                                        deleteSched(context, item['sched_id']);
-                                      }, 
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff274c77),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        )
-                                      ),
-                                      child: Text('Confirm', style: TextStyle(
-                                          color: Colors.white,
-                                        ),)),
-                                      SizedBox(width: 10,),
-                                      ElevatedButton(onPressed: (){Navigator.of(context).pop();},
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xff274c77),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        )
-                                      ), child: Text('Cancel',style: TextStyle(
-                                          color: Colors.white,))),
-                                    ],
-                                  ),
+                        SizedBox(width: 10,),
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.red),
+                            ),
+                            onPressed: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                  AlertDialog(
+                                  title: Text("Confirm Schedule Deletion?", style: TextStyle(fontSize: 20)),
+                                  content: SingleChildScrollView(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton(onPressed: (){
+                                          deleteSched(context, item['sched_id']);
+                                        }, 
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xff274c77),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10)
+                                          )
+                                        ),
+                                        child: Text('Confirm', style: TextStyle(
+                                            color: Colors.white,
+                                          ),)),
+                                        SizedBox(width: 10,),
+                                        ElevatedButton(onPressed: (){Navigator.of(context).pop();},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xff274c77),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10)
+                                          )
+                                        ), child: Text('Cancel',style: TextStyle(
+                                            color: Colors.white,))),
+                                      ],
+                                    ),
+                                  )
                                 )
-                              )
-                            );
-                            
-                          },
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                      )
-                    ],
+                              );
+                              
+                            },
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ];
-
-              rows.add(DataRow(cells: displayedDataCell));
-            }
-
-            return SingleChildScrollView(
-              child: Container(
-                alignment: Alignment.topCenter,
-                child: FittedBox(
-                  child: Center(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: DataTable(
-                        columns: const <DataColumn>[
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.chalkboard),
-                              Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.graduationCap),
-                              Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              Icon(Icons.badge),
-                              Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
-                              Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.hourglassHigh),
-                              Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.hourglassLow),
-                              Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.calendarBlank),
-                              Text('Day of the Week', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                          DataColumn(label: Expanded(child: Center(child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              PhosphorIcon(PhosphorIconsFill.gearSix),
-                              Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            ],
-                          )))),
-                        ],
-                        rows: rows.map((row) {
-                          final rowIndex = rows.indexOf(row);
-                          final color = rowIndex.isEven ? bgColor : Colors.white;
-                          return DataRow(
-                            color: MaterialStateColor.resolveWith((states) => color!),
-                            cells: row.cells,
-                          );
-                        }).toList(),
+                ]);
+              }).toList();
+          
+              return SingleChildScrollView(
+                child: Container(
+                  alignment: Alignment.topCenter,
+                  child: FittedBox(
+                    child: Center(
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: DataTable(
+                          columns: const <DataColumn>[
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.chalkboard),
+                                Text('Class', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.graduationCap),
+                                Text('Course', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.badge),
+                                Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
+                                Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.clockAfternoon),
+                                Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.clockAfternoon),
+                                Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                Icon(Icons.calendar_month),
+                                Text('Weekday', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))
+                          ],
+                          rows: rows,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-    );
-  }
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
