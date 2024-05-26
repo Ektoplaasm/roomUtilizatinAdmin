@@ -384,8 +384,10 @@ class _ViewReservationsState extends State<ViewReservations> {
                                 content: SingleChildScrollView(
                                   child: ListBody(
                                     children: [
-                                      Expanded(
+                                      SizedBox(
+                                        width: 100.0,
                                         child: TextField(
+                                          maxLines: null,
                                           controller: reasonController,
                                           decoration: InputDecoration(labelText: 'Enter Message for the Student.'),
                                         ),
@@ -415,7 +417,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                                               color: Colors.white,
                                             ),)),
                                           SizedBox(width: 10,),
-                                          ElevatedButton(onPressed: (){Navigator.of(context).pop();},
+                                          ElevatedButton(onPressed: (){Navigator.of(context).pop();reasonController.clear();},
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff274c77),
                                             shape: RoundedRectangleBorder(
@@ -447,8 +449,10 @@ class _ViewReservationsState extends State<ViewReservations> {
                                   child: ListBody(
                                     children: [
                                       
-                                      Expanded(
+                                      SizedBox(
+                                        width: 100.0,
                                         child: TextField(
+                                          maxLines: null,
                                           controller: reasonController,
                                           decoration: InputDecoration(labelText: 'Enter Reason for Rejection.'),
                                         ),
@@ -472,7 +476,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                                       ), child: Text('Confirm',style: TextStyle(
                                           color: Colors.white,))),
                                       const SizedBox(width: 10),
-                                      ElevatedButton(onPressed: (){Navigator.of(context).pop();}, 
+                                      ElevatedButton(onPressed: (){Navigator.of(context).pop();reasonController.clear();}, 
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xff274c77),
                                         shape: RoundedRectangleBorder(
