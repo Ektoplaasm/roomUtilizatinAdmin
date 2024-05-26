@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:admin_addschedule/services/firestore.dart';
 import 'package:admin_addschedule/main.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:quiver/iterables.dart';
 
 class AddRoomSchedule extends StatefulWidget {
@@ -104,6 +105,7 @@ class _HomePageState extends State<AddRoomSchedule> {
   String? _selectedDay;
   List liststart = [];
   List listEnd = [];
+  bool allowConflicts = false;
 
   @override
   Widget build(BuildContext context) {
@@ -308,79 +310,93 @@ class _HomePageState extends State<AddRoomSchedule> {
               
               SizedBox(height: 15,),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              Container(
+              
+              child: Column(
                 children: [
-                  DropdownButton<int>(
-                    value: selectedValueStart,
-                    items: timeSchedValue.map((int value) {
-
-                      // List _list = [];
-                      if(takenTimes.isNotEmpty){
-                      var pairs = partition(takenTimes, 2);
-                      for(List<int> pair in pairs){
-                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)), (i) => pair.elementAt(1)-(i+1));
-                        liststart.addAll(timeSlots);
-                        // print(list); 
-                      } 
-                      }
-                      bool isDisabled = liststart.contains(value);
-
-
-                      var displayString = _formatTime(value);
-                      var displayValue = _getTimeWithPeriod(value);
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(
-                          displayValue,
-                          style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
-                        ),
-                        enabled: !isDisabled,
-                      );
-                    }).toList(),
-                    onChanged: (int? newValue) {
-                      if (newValue != null && !liststart.contains(newValue)) {
-                        setState(() {
-                          selectedValueStart = newValue;
-                        });
-                      }
+                  
+                  CheckboxListTile(
+                    title: Row(
+                      children: [
+                        PhosphorIcon(PhosphorIconsFill.warning, color: Colors.red,),
+                        SizedBox(width: 5,),
+                        Text('Allow conflicting times', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
+                      ],
+                    ),
+                    value: allowConflicts,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        allowConflicts = value!;
+                      });
                     },
                   ),
-                  const SizedBox(width: 10,),
-                  const Text("To", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-                  const SizedBox(width: 10,),
-               
-                  DropdownButton<int>(
-                    value: selectedValueEnd,
-                    items: timeSchedValue.map((int value) {
-                      // List list = [];
-                      if(takenTimes.isNotEmpty){
-                      var pairs = partition(takenTimes, 2);
-                      for(List<int> pair in pairs){
-                        var timeSlots =List.generate(pair.elementAt(1)-(pair.elementAt(0)), (i) => pair.elementAt(1)-(i+1));
-                        listEnd.addAll(timeSlots);
-                        // print(list); 
-                      } 
-                      }
-                      bool isDisabled = listEnd.contains(value);
+                ],
+              ),
+              ),
 
 
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    DropdownButton<int>(
+                      value: selectedValueStart,
+                      items: timeSchedValue.map((int value) {
+                        if (takenTimes.isNotEmpty) {
+                          var pairs = partition(takenTimes, 2);
+                          for (List<int> pair in pairs) {
+                            var timeSlots = List.generate(pair.elementAt(1) - pair.elementAt(0), (i) => pair.elementAt(1) - (i + 1));
+                            liststart.addAll(timeSlots);
+                          }
+                        }
+                        bool isDisabled = liststart.contains(value) && !allowConflicts;
 
-                      var displayString = _formatTime(value);
-                      var displayValue = _getTimeWithPeriod(value);
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(
-                          displayValue,
-                          style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
-                        ),
-                        enabled: !isDisabled,
-                      );
-                    }).toList(),
-                    onChanged: (int? newValue) {
-                      if (newValue != null && !listEnd.contains(newValue)) {
-                        setState(() {
-                          selectedValueEnd = newValue;
+                        var displayValue = _getTimeWithPeriod(value);
+                        return DropdownMenuItem<int>(
+                          value: value,
+                          child: Text(
+                            displayValue,
+                            style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                          ),
+                          enabled: !isDisabled,
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        if (newValue != null && (!liststart.contains(newValue) || allowConflicts)) {
+                          setState(() {
+                            selectedValueStart = newValue;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    const Text("To", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 10),
+                    DropdownButton<int>(
+                      value: selectedValueEnd,
+                      items: timeSchedValue.map((int value) {
+                        if (takenTimes.isNotEmpty) {
+                          var pairs = partition(takenTimes, 2);
+                          for (List<int> pair in pairs) {
+                            var timeSlots = List.generate(pair.elementAt(1) - pair.elementAt(0), (i) => pair.elementAt(1) - (i + 1));
+                            listEnd.addAll(timeSlots);
+                          }
+                        }
+                        bool isDisabled = listEnd.contains(value) && !allowConflicts;
+
+                        var displayValue = _getTimeWithPeriod(value);
+                        return DropdownMenuItem<int>(
+                          value: value,
+                          child: Text(
+                            displayValue,
+                            style: TextStyle(color: isDisabled ? Colors.grey : Colors.black),
+                          ),
+                          enabled: !isDisabled,
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        if (newValue != null && (!listEnd.contains(newValue) || allowConflicts)) {
+                          setState(() {
+                            selectedValueEnd = newValue;
                         });
                       }
                     },

@@ -210,14 +210,17 @@ class _ViewReservationsState extends State<ViewReservations> {
                 );
         
                   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
-                  String formattedDate = DateFormat('MMMM d, yyyy').format(dateTime);
+                  String formattedStartDate = DateFormat('MMMM d, yyyy').format(dateTime);
+                  DateTime dateEndTime = DateTime.fromMillisecondsSinceEpoch(item['end_date']);
+                  String formattedEndDate = DateFormat('MMMM d, yyyy').format(dateEndTime);
                 
                   displayedDataCell = [
                     DataCell(Center(child: Text(item['id'].toString()))),
                     DataCell(Center(child: Text(item['name'].toString()))),
                     DataCell(Center(child: Text(item['email'].toString()))),
                     DataCell(Center(child: Text(item['room_id'].toString()))),
-                    DataCell(Center(child: Text(formattedDate))),
+                    DataCell(Center(child: Text(formattedStartDate))),
+                    DataCell(Center(child: Text(formattedEndDate))),
                     DataCell(Center(child: Text(displayStringStart))),
                     DataCell(Center(child: Text(displayStringEnd))),
                     DataCell(
@@ -534,7 +537,13 @@ class _ViewReservationsState extends State<ViewReservations> {
                             DataColumn(label: Expanded(child: Center(child: Row(
                               children: [
                                 PhosphorIcon(PhosphorIconsFill.calendarDot),
-                                Text('Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                Text('Start Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.calendarDot),
+                                Text('End Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
                             DataColumn(label: Expanded(child: Center(child: Row(
