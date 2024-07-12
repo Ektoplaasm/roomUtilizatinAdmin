@@ -419,7 +419,13 @@ class _HomePageState extends State<AddRoomSchedule> {
                     _selectedDay,
                     _selectedSemester!,
                     
-                  );
+                  ).then((_) {
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Schedule added successfully!'),
+                      ),
+                     );
+                  });
                   
                 },
                 style: ElevatedButton.styleFrom(
@@ -443,8 +449,14 @@ class _HomePageState extends State<AddRoomSchedule> {
                 takenTimes = [];
                 selectedValueStart = 6;
                 selectedValueEnd = 6;
-                
-              }, 
+                  () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Cleared!'),
+                      ),
+                    );
+                  };
+                }, 
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
@@ -453,8 +465,6 @@ class _HomePageState extends State<AddRoomSchedule> {
               ),
               child: const Text('Clear Form', style: TextStyle(color: Colors.white),))
               ],)
-              
-              
               
             ],
           ),

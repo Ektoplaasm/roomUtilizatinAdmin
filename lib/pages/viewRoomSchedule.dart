@@ -280,6 +280,7 @@ Future<void> _loadWeekdays() async {
         .collection('schedule_details')
         .doc(sched_id)
         .delete();
+    Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Schedule deleted successfully')),
     );

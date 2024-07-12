@@ -208,6 +208,31 @@ class _ViewReservationsState extends State<ViewReservations> {
                     style: TextStyle(color: statustextColor),
                   ),
                 );
+
+                String type;
+        
+                switch (item['type'].toString()) {
+                  case '1':
+                    type = 'Once';
+                    break;
+                  case '2':
+                    type = 'Consecutive';
+                    break;
+                  case '3':
+                    type = 'Recurring';
+                    break;
+                  default:
+                    type = 'Unknown Status';
+                    break;
+                }
+
+                Widget reservationTypeWidget = Container(
+                  child: Text(
+                    type, style: TextStyle(fontSize: 15),
+                  ),
+                );
+
+                
         
                   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(item['date']);
                   String formattedStartDate = DateFormat('MMMM d, yyyy').format(dateTime);
@@ -219,6 +244,7 @@ class _ViewReservationsState extends State<ViewReservations> {
                     DataCell(Center(child: Text(item['name'].toString()))),
                     DataCell(Center(child: Text(item['email'].toString()))),
                     DataCell(Center(child: Text(item['room_id'].toString()))),
+                    DataCell(Center(child: (reservationTypeWidget))),
                     DataCell(Center(child: Text(formattedStartDate))),
                     DataCell(Center(child: Text(formattedEndDate))),
                     DataCell(Center(child: Text(displayStringStart))),
@@ -528,6 +554,12 @@ class _ViewReservationsState extends State<ViewReservations> {
                               children: [
                                 PhosphorIcon(PhosphorIconsFill.chalkboard),
                                 Text('Room', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.calendarBlank),
+                                Text('Reservation Type', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
                             DataColumn(label: Expanded(child: Center(child: Row(
