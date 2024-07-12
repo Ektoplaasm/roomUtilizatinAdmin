@@ -1,8 +1,10 @@
 import 'package:admin_addschedule/firebase_options.dart';
 import 'package:admin_addschedule/pages/addRoomSchedule.dart';
 import 'package:admin_addschedule/pages/addSemester.dart';
+import 'package:admin_addschedule/pages/calendar.dart';
 import 'package:admin_addschedule/pages/signin%20copy.dart';
 import 'package:admin_addschedule/pages/signin.dart';
+import 'package:admin_addschedule/pages/viewCalendar.dart';
 import 'package:admin_addschedule/pages/viewReservations.dart';
 import 'package:admin_addschedule/pages/viewReservationsApproved.dart';
 import 'package:admin_addschedule/pages/viewReservationsDisapproved.dart';
@@ -88,6 +90,8 @@ class SidebarXExampleApp extends StatelessWidget {
         return 'Add Schedule';
       case 5:
         return 'Add Semester';
+      case 6:
+        return 'View Calendar';
       default:
         return 'Page Not Found';
     }
@@ -224,7 +228,7 @@ class ExampleSidebarX extends StatelessWidget {
             _controller.selectIndex(3);
           },
         ),
-      
+
         SidebarXItem(
           icon: Icons.schedule,
           label: 'Add Schedule',
@@ -238,6 +242,14 @@ class ExampleSidebarX extends StatelessWidget {
           label: 'Add Semester',
           onTap: () {
             _controller.selectIndex(5);
+          },
+        ),
+
+        SidebarXItem(
+          icon: Icons.view_agenda,
+          label: 'View Calendar',
+          onTap: () {
+            _controller.selectIndex(6);
           },
         ),
 
@@ -287,6 +299,8 @@ class _ScreensExample extends StatelessWidget {
         return AddRoomSchedule();
       case 5:
         return Semester();
+      case 6:
+        return PietPainting();
       default:
         return SignIn();
     }
