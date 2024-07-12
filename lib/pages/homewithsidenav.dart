@@ -36,8 +36,8 @@ class SidebarXExampleApp extends StatelessWidget {
       textTheme: const TextTheme(
         headlineSmall: TextStyle(
           color: Colors.black,
-          fontSize: 46,
-          fontWeight: FontWeight.w800,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
         ),
       ),
     ),
