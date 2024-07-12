@@ -175,9 +175,13 @@ class _ViewReservationsApprovedState extends State<ViewReservationsApproved> {
                 rows.add(DataRow(cells: displayedDataCell));
               }
               
-              return FittedBox(
+              return 
+              Container(
+                alignment: Alignment.topCenter,
+                child:
+              FittedBox(
                 child: Container(
-                  alignment: Alignment.center,
+                  alignment: Alignment.topCenter,
                   child: DataTable(
                     columns: const <DataColumn>[
                       DataColumn(label: Expanded(child: Center(child: Row(
@@ -235,12 +239,12 @@ class _ViewReservationsApprovedState extends State<ViewReservationsApproved> {
                   }).toList(),
                   ),
                 ),
-              );
+              ));
             }
             
             else {return const Center(child: CircularProgressIndicator());}
           } 
-        )
+        ) 
       );
   }
 }

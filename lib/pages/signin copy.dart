@@ -299,7 +299,7 @@ class _SignIn2State extends State<SignIn2> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Cisc Room Util.',
+                            'CISC Room Utilization',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 30,
