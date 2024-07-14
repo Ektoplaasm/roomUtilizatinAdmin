@@ -11,22 +11,25 @@ class Semester {
       this.date_created);
 
   static Semester fromMap(Map<String, dynamic> map, [String? id]) {
+    // Provide default values for fields that might be null
+    String semesterName = map['semester_name'] ?? '';
+    Timestamp startDate = map['start_date'] != null
+        ? map['start_date'] as Timestamp
+        : Timestamp.now();
+    Timestamp endDate = map['end_date'] != null
+        ? map['end_date'] as Timestamp
+        : Timestamp.now();
+    Timestamp dateCreated = map['date_created'] != null
+        ? map['date_created'] as Timestamp
+        : Timestamp.now();
+
     return Semester(
       id ?? map['id'],
-      map['semester_name'] as String,
-      map['start_date'] as Timestamp,
-      map['end_date'] as Timestamp,
-      map['date_created'] as Timestamp,
+      semesterName,
+      startDate,
+      endDate,
+      dateCreated,
     );
-  }
-
-  static Future<Semester?> getSemester() async {
-    DocumentSnapshot doc =
-        await FirebaseFirestore.instance.collection('semester').doc().get();
-    if (doc.exists) {
-      return Semester.fromMap(doc.data() as Map<String, dynamic>);
-    }
-    return null;
   }
 
   static Future<Semester?> getSemesterbyID(String id) async {
@@ -49,6 +52,7 @@ class Semester {
         semesters.add(Semester.fromMap(doc.data() as Map<String, dynamic>));
       }
     }
+
     return semesters;
   }
 
@@ -61,6 +65,7 @@ class Semester {
         .then((querySnapshot) => querySnapshot.docs.first);
 
     if (!snapshot.exists) {
+      print("NULL");
       return null;
     }
 
