@@ -8,13 +8,12 @@ class Schedule_Details {
   int start_time;
   int end_time;
   String semester_id;
-  List<String> weekdays;
+  String weekday;
 
   Schedule_Details(this.course, this.class_name, this.room_id, this.instructor,
-      this.start_time, this.end_time, this.semester_id, this.weekdays);
+      this.start_time, this.end_time, this.semester_id, this.weekday);
 
   static Schedule_Details fromMap(Map<String, dynamic> map) {
-    List<String> weekdays = List<String>.from(map['weekday'] ?? []);
     return Schedule_Details(
         map['course'] ?? '',
         map['class'] ?? '',
@@ -23,7 +22,7 @@ class Schedule_Details {
         map['start_time'] ?? 0,
         map['end_time'] ?? 0,
         map['semester_id'] ?? '',
-        weekdays);
+        map['weekday'] ?? '');
   }
 
   Map<String, dynamic> toMap() {
@@ -35,7 +34,7 @@ class Schedule_Details {
       'start_time': start_time,
       'end_time': end_time,
       'semester_id': semester_id,
-      'weekday': weekdays
+      'weekday': weekday
     };
   }
 
@@ -47,7 +46,9 @@ class Schedule_Details {
           .where('semester_id', isEqualTo: semester_id)
           .where('room_id', isEqualTo: room_id)
           .get();
-
+      for (var scheds in querySnapshot.docs) {
+        print(scheds);
+      }
       return querySnapshot.docs
           .map((doc) =>
               Schedule_Details.fromMap(doc.data() as Map<String, dynamic>))
@@ -78,12 +79,33 @@ class Schedule_Details {
   }
 
   static Future<List<Schedule_Details>> getSchedulesBySemester(
-      String semester_id) async {
+      String room_id, String semester_id) async {
     try {
       print("sem_id:${semester_id}");
+      print("sem_id:${room_id}");
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('schedule_details')
+          .where('room_id', isEqualTo: room_id)
           .where('semester_id', isEqualTo: semester_id)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) =>
+              Schedule_Details.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print("Error reading schedule details: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Schedule_Details>> getSchedulesByRoom(
+      String room_id) async {
+    try {
+      print("sem_id:${room_id}");
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('schedule_details')
+          .where('room_id', isEqualTo: room_id)
           .get();
 
       return querySnapshot.docs

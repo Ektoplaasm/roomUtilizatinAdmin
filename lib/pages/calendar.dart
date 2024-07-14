@@ -9,11 +9,15 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarWidget extends StatelessWidget {
+  // PietPaintingState main = PietPaintingState();
+
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<CalendarData>(context);
     String roomId = provider.newroomId;
     String semesterId = provider.newsemesterId;
+    print("semester ${semesterId}");
+
     return Scaffold(
       body: FutureBuilder<MeetingDataSource>(
         future: _fetchMeetings(roomId, semesterId),
@@ -25,6 +29,7 @@ class CalendarWidget extends StatelessWidget {
           } else {
             return SfCalendar(
               view: CalendarView.week,
+              showNavigationArrow: true,
               dataSource: snapshot.data,
               monthViewSettings: const MonthViewSettings(
                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
@@ -32,11 +37,11 @@ class CalendarWidget extends StatelessWidget {
               timeSlotViewSettings: TimeSlotViewSettings(
                 startHour: 6,
                 endHour: 20,
-                timeIntervalHeight: 39,
+                timeIntervalHeight: 100,
               ),
               headerStyle: CalendarHeaderStyle(
                   textAlign: TextAlign.center,
-                  backgroundColor: Color.fromARGB(255, 30, 23, 104),
+                  backgroundColor: Color(0xff4f749f),
                   textStyle: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -44,7 +49,7 @@ class CalendarWidget extends StatelessWidget {
                     fontSize: 25,
                   )),
               viewHeaderStyle: ViewHeaderStyle(
-                backgroundColor: Color.fromARGB(255, 237, 235, 255),
+                backgroundColor: Color(0xfff0f4f9),
                 dateTextStyle: TextStyle(),
                 dayTextStyle: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -62,83 +67,124 @@ class CalendarWidget extends StatelessWidget {
   Color getRandomLightColor() {
     var rng = Random();
     return Color.fromRGBO(
-      rng.nextInt(201),
-      rng.nextInt(201),
-      rng.nextInt(201),
+      rng.nextInt(150),
+      rng.nextInt(150),
+      rng.nextInt(150),
       1,
     );
   }
 
   Future<MeetingDataSource> _fetchMeetings(
       String roomId, String semesterId) async {
-    print("fetching data");
-    print(roomId);
-    print(semesterId);
     List<Meeting> appointments = <Meeting>[];
 
     final Semester? semester = await Semester.getSemesterbyID(semesterId);
     final List<Schedule_Details> scheduleDetails =
         await Schedule_Details.readScheduleDetails(semesterId, roomId);
     final List<Reservation> reservationDetails =
-        await Reservation.readReservationDetails(roomId);
+        await Reservation.readActiveReservationDetails(roomId);
 
-    // Reservation
-    print("reservation_details: ${reservationDetails}");
-    for (var detail in reservationDetails) {
-      print("reserved by: ${detail.name}");
-      print("Processing detail: ${detail.date.year}");
-      print("Processing detail: ${detail.date.month}");
-      print("Processing detail: ${detail.date.day}");
-      print("Processing detail: ${detail.start_time}");
-      print("Processing detail: ${detail.end_time}");
-      appointments.add(Meeting(
-        eventName: "Reserved By:${detail.name}",
-        from: DateTime(detail.date.year, detail.date.month, detail.date.day,
-            detail.start_time),
-        to: DateTime(detail.date.year, detail.date.month, detail.date.day,
-            detail.end_time),
-        background: getRandomLightColor(),
-        recurrenceRule: 'FREQ=DAILY;INTERVAL=1;COUNT=1',
-      ));
+    if (reservationDetails.length != 0) {
+      for (var detail in reservationDetails) {
+        if (detail.type == 1) {
+          appointments.add(Meeting(
+            eventName: "Reserved By:${detail.name}",
+            from: DateTime(
+                DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                detail.start_time),
+            to: DateTime(
+                DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                detail.end_time),
+            background: getRandomLightColor(),
+            recurrenceRule: 'FREQ=DAILY;INTERVAL=1;COUNT=1',
+          ));
+        } else if (detail.type == 2) {
+          int count = DateTime.fromMillisecondsSinceEpoch(detail.end_date).day -
+              DateTime.fromMillisecondsSinceEpoch(detail.date).day;
+          print(DateTime.fromMillisecondsSinceEpoch(detail.end_date).day);
+          print(DateTime.fromMillisecondsSinceEpoch(detail.date).day);
+          appointments.add(Meeting(
+            eventName: "Reserved By:${detail.name}",
+            from: DateTime(
+                DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                detail.start_time),
+            to: DateTime(
+                DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                detail.end_time),
+            background: getRandomLightColor(),
+            recurrenceRule: 'FREQ=DAILY;INTERVAL=1;COUNT=${count + 1}',
+          ));
+        } else if (detail.type == 3) {
+          List<String> daysArray = detail.recurringString.split(",");
+          for (var day in daysArray) {
+            int count =
+                DateTime.fromMillisecondsSinceEpoch(detail.end_date).day -
+                    DateTime.fromMillisecondsSinceEpoch(detail.date).day;
+            print(DateTime.fromMillisecondsSinceEpoch(detail.end_date).day);
+            print(DateTime.fromMillisecondsSinceEpoch(detail.date).day);
+            appointments.add(Meeting(
+              eventName: "Reserved By:${detail.name}",
+              from: DateTime(
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                  detail.start_time),
+              to: DateTime(
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).year,
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).month,
+                  DateTime.fromMillisecondsSinceEpoch(detail.date).day,
+                  detail.end_time),
+              background: getRandomLightColor(),
+              recurrenceRule: 'FREQ=DAILY;INTERVAL=1;COUNT=${count + 1}',
+            ));
+          }
+        }
+      }
     }
 
     // Schedules
     if (semester != null) {
-      print(
-          "Semester details: ${semester.start_date.toDate()} - ${semester.end_date.toDate()}");
-      print("Schedule details count: ${scheduleDetails.length}");
       for (var detail in scheduleDetails) {
-        print("Processing detail: ${detail.class_name}");
-        print("Processing detail: ${detail.course}");
-        print("Processing detail: ${detail.instructor}");
-        print("Processing detail: ${detail.start_time}");
-        print("Processing detail: ${detail.end_time}");
-
         String recurrenceRule = 'FREQ=WEEKLY;BYDAY=';
-        for (String day in detail.weekdays) {
-          switch (day.toLowerCase()) {
-            case 'monday':
-              recurrenceRule += 'MO';
-              break;
-            case 'tuesday':
-              recurrenceRule += 'TU';
-              break;
-            case 'wednesday':
-              recurrenceRule += 'WE';
-              break;
-            case 'thursday':
-              recurrenceRule += 'TH';
-              break;
-            case 'friday':
-              recurrenceRule += 'FR';
-              break;
-            default:
-              print("Invalid weekday: ${day}");
-              continue;
-          }
+
+        switch (detail.weekday.toLowerCase()) {
+          case 'monday':
+            recurrenceRule += 'MO';
+            break;
+          case 'tuesday':
+            recurrenceRule += 'TU';
+            break;
+          case 'wednesday':
+            recurrenceRule += 'WE';
+            break;
+          case 'thursday':
+            recurrenceRule += 'TH';
+            break;
+          case 'friday':
+            recurrenceRule += 'FR';
+            break;
+          case 'saturday':
+            recurrenceRule += 'SA';
+            break;
+          case 'sunday':
+            recurrenceRule += 'SU';
+            break;
+          default:
+            print("Invalid weekday: ${detail.weekday}");
+            continue;
         }
         int daysCount = countDays(semester.start_date.toDate(),
-            semester.end_date.toDate(), detail.weekdays);
+            semester.end_date.toDate(), detail.weekday);
+        print("How Many Days?${daysCount}");
+
         appointments.add(Meeting(
           eventName: detail.class_name +
               "\n" +
@@ -167,45 +213,42 @@ class CalendarWidget extends StatelessWidget {
   }
 }
 
-int countDays(DateTime startDate, DateTime endDate, List<String> days) {
+int countDays(DateTime startDate, DateTime endDate, String dayOfWeek) {
   int count = 0;
   DateTime currentDate = startDate;
-
-  Set<int> targetWeekdays = days.map((day) {
-    switch (day.toLowerCase()) {
-      case 'monday':
-        return DateTime.monday;
-      case 'tuesday':
-        return DateTime.tuesday;
-      case 'wednesday':
-        return DateTime.wednesday;
-      case 'thursday':
-        return DateTime.thursday;
-      case 'friday':
-        return DateTime.friday;
-      case 'saturday':
-        return DateTime.saturday;
-      case 'sunday':
-        return DateTime.sunday;
-      default:
-        throw ArgumentError('Invalid weekday: $day');
-    }
-  }).toSet();
-
+  print(dayOfWeek);
+  print(startDate);
+  print(endDate);
   while (
       currentDate.isBefore(endDate) || currentDate.isAtSameMomentAs(endDate)) {
-    if (targetWeekdays.contains(currentDate.weekday)) {
+    if (currentDate.weekday == getWeekdayNumber(dayOfWeek)) {
       count++;
     }
+
     currentDate = currentDate.add(Duration(days: 1));
   }
-  print(count);
+
   return count;
 }
 
-class _AppointmentDataSource extends CalendarDataSource {
-  _AppointmentDataSource(List<Appointment> source) {
-    appointments = source;
+int getWeekdayNumber(String dayName) {
+  switch (dayName.toLowerCase()) {
+    case 'monday':
+      return 1;
+    case 'tuesday':
+      return 2;
+    case 'wednesday':
+      return 3;
+    case 'thursday':
+      return 4;
+    case 'friday':
+      return 5;
+    case 'saturday':
+      return 6;
+    case 'sunday':
+      return 0;
+    default:
+      throw ArgumentError('Invalid day name provided.');
   }
 }
 
@@ -216,12 +259,12 @@ class MeetingDataSource extends CalendarDataSource {
 
   @override
   DateTime getStartTime(int index) {
-    return appointments![index].from;
+    return appointments![index].from as DateTime;
   }
 
   @override
   DateTime getEndTime(int index) {
-    return appointments![index].to;
+    return appointments![index].to as DateTime;
   }
 
   @override
