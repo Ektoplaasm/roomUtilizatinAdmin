@@ -114,12 +114,23 @@ class _SemesterState extends State<Semester> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text('Start Date:'),
+                          Text('Start Date:', style: TextStyle(fontWeight: FontWeight.bold),),
                           SizedBox(width: 10),
                           ElevatedButton(
+                            style:  const ButtonStyle(
+                              shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                                  side: BorderSide(color: Colors.black)
+                                )
+                              ),
+                              backgroundColor: WidgetStatePropertyAll(Colors.white)
+                              
+                            ),
+                            
                             onPressed: () => _selectDate(context, true),
                             child: Text(
-                              _formatDate(_startDate),
+                              _formatDate(_startDate), style: const TextStyle(color: Colors.black),
                             ),
                           ),
                         ],
@@ -129,12 +140,22 @@ class _SemesterState extends State<Semester> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(' End Date:'),
+                        Text(' End Date:', style: TextStyle(fontWeight: FontWeight.bold),),
                         SizedBox(width: 10),
                         ElevatedButton(
+                          style:  const ButtonStyle(
+                              shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                                  side: BorderSide(color: Colors.black)
+                                )
+                              ),
+                              backgroundColor: WidgetStatePropertyAll(Colors.white)
+                              
+                            ),
                           onPressed: () => _selectDate(context, false),
                           child: Text(
-                            _formatDate(_endDate),
+                            _formatDate(_endDate), style: const TextStyle(color: Colors.black)
                           ),
                         ),
                       ],

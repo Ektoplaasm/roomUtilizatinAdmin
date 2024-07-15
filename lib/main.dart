@@ -30,9 +30,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignIn2(),
+      // home: SignIn2(),
+      home: SidebarXExampleApp(),
     );
   }
 }
