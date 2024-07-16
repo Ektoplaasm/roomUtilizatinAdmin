@@ -82,7 +82,25 @@ class _ViewReservationsState extends State<ViewReservations> {
   }
 
   TextEditingController reasonController = TextEditingController();
+  String? _selectedStatus = "Pending";
+  int reserveStatus = 0;
+
+  void _filterSchedules(String? selectedSemesterId) {
+    setState(() {
+      // _selectedSemester = selectedSemesterId;
+    });
+
+    if (selectedSemesterId == 'all') {
+      // _loadallschedules();
+    }
+  }
     
+  Map<String, int> reservationStatus = {
+    "Pending" : 0,
+    "Approved" : 1,
+    "Disapproved" : 2,
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,11 +116,34 @@ class _ViewReservationsState extends State<ViewReservations> {
             ],
           )),
       ),
-      body: SingleChildScrollView(
+      body: Column(children: [
+        DropdownButton<String>(
+              value: _selectedStatus,
+              focusColor: Colors.white,
+              items: reservationStatus.keys.map((String value) {
+                return DropdownMenuItem(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (v) {
+                setState(() {
+                  _selectedStatus = v;
+                  if(_selectedStatus == "Pending"){
+                      reserveStatus = 0;
+                  } else if(_selectedStatus == "Approved") {
+                      reserveStatus = 1; 
+                  } else if(_selectedStatus == "Disapproved"){
+                      reserveStatus = 2;
+                  };
+                });
+              },
+            ),
+        SingleChildScrollView(
         child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
               .collection('reservations')
-              .where('status', isEqualTo: 0)
+              .where('status', isEqualTo: reserveStatus)
               .snapshots(),
             builder: (context, snapshot){
               if (snapshot.hasData){
@@ -398,7 +439,8 @@ class _ViewReservationsState extends State<ViewReservations> {
                             ),
                           ),
                           SizedBox(width: 10,),
-                          Center(
+                          if (reserveStatus == 0) ...[
+                            Center(
                             child: ElevatedButton(
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(Colors.green),
@@ -522,6 +564,8 @@ class _ViewReservationsState extends State<ViewReservations> {
                               child: const Icon(Icons.close, color: Colors.white),
                             ),
                           ),
+                          ],
+                          
                         ],
                       ),
                       
@@ -617,6 +661,7 @@ class _ViewReservationsState extends State<ViewReservations> {
             } 
           ),
       )
+      ]) 
       );
   }
 }
