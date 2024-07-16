@@ -89,7 +89,7 @@ class SidebarXExampleApp extends StatelessWidget {
       case 4:
         return 'Add Schedule';
       case 5:
-        return 'Add Semester';
+        return 'View Semesters';
       case 6:
         return 'View Calendar';
       default:
@@ -239,7 +239,7 @@ class ExampleSidebarX extends StatelessWidget {
 
         SidebarXItem(
           icon: Icons.date_range,
-          label: 'Add Semester',
+          label: 'View Semesters',
           onTap: () {
             _controller.selectIndex(5);
           },
