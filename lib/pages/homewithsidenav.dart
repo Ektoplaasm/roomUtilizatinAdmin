@@ -79,7 +79,7 @@ class SidebarXExampleApp extends StatelessWidget {
   String _getTitleByIndex(int index) {
     switch (index) {
       case 0:
-        return 'View Pending';
+        return 'Reservations';
       case 1:
         return 'View Approved';
       case 2:
@@ -199,25 +199,9 @@ class ExampleSidebarX extends StatelessWidget {
       items: [
        SidebarXItem(
           icon: Icons.view_agenda,
-          label: 'View Pending',
+          label: 'Reservations',
           onTap: () {
             _controller.selectIndex(0);
-          },
-        ),
-
-        SidebarXItem(
-          icon: PhosphorIconsFill.calendarCheck,
-          label: 'View Approved',
-          onTap: () {
-            _controller.selectIndex(1);
-          },
-        ),
-
-        SidebarXItem(
-          icon: PhosphorIconsFill.calendarSlash,
-          label: 'View Disapproved',
-          onTap: () {
-            _controller.selectIndex(2);
           },
         ),
 
@@ -239,7 +223,7 @@ class ExampleSidebarX extends StatelessWidget {
 
         SidebarXItem(
           icon: Icons.date_range,
-          label: 'View Semesters',
+          label: 'Semesters',
           onTap: () {
             _controller.selectIndex(5);
           },
@@ -247,7 +231,7 @@ class ExampleSidebarX extends StatelessWidget {
 
         SidebarXItem(
           icon: Icons.view_agenda,
-          label: 'View Calendar',
+          label: 'Calendar',
           onTap: () {
             _controller.selectIndex(6);
           },
@@ -290,16 +274,12 @@ class _ScreensExample extends StatelessWidget {
       case 0:
         return ViewReservations();
       case 1:
-        return ViewReservationsApproved();
-      case 2:
-        return ViewReservationsDisapproved();
-      case 3:
         return ViewRoomSchedule();
-      case 4:
+      case 2:
         return AddRoomSchedule();
-      case 5:
+      case 3:
         return Semester();
-      case 6:
+      case 4:
         return PietPainting();
       default:
         return SignIn();
