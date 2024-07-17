@@ -115,9 +115,8 @@ class _ViewReservationsState extends State<ViewReservations> {
               const Text("View Room Reservations", style: TextStyle(fontWeight: FontWeight.bold),),
             ],
           )),
-      ),
-      body: Column(children: [
-        DropdownButton<String>(
+          actions: [
+            DropdownButton<String>(
               value: _selectedStatus,
               focusColor: Colors.white,
               items: reservationStatus.keys.map((String value) {
@@ -139,6 +138,10 @@ class _ViewReservationsState extends State<ViewReservations> {
                 });
               },
             ),
+            SizedBox(width: 20,),
+          ],
+      ),
+      body: Column(children: [
         SingleChildScrollView(
         child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
