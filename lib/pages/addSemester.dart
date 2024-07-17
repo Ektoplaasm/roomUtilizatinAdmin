@@ -2,6 +2,7 @@
   import 'package:admin_addschedule/services/firestore.dart';
   import 'package:intl/intl.dart';
   import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
   class Semester extends StatefulWidget {
     const Semester({Key? key}) : super(key: key);
@@ -44,27 +45,24 @@
     _semesterNameController.clear();
   }
 
-  void _showEditDialog(DocumentSnapshot item) {
-  print('Dialog opened for item: ${item.id}');
+  Future<void> _updateSemester(String documentID, DateTime start_date, String semester_name, DateTime end_date) async {
+    try {
+      await _firestoreService.updateSemester(
+        documentID,
+        start_date,
+        semester_name,
+        end_date,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Semester updated successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating semester: $e')),
+      );
+    }
+  }
   
-  TextEditingController classController = TextEditingController(text: item['semester_name'].toString());
-  TextEditingController courseController = TextEditingController(text: item['start'].toString());
-  TextEditingController instructorController = TextEditingController(text: item['instructor'].toString());
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text('Edit Semester'),
-            content: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-
-
-                ])));});});}
-
   Future<void> deleteSem(BuildContext context, String sem_id) async {
   try {
     await FirebaseFirestore.instance
@@ -84,22 +82,23 @@
 
 
     Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2101),
-      );
-      if (picked != null && picked != (isStartDate ? _startDate : _endDate)) {
-        setState(() {
-          if (isStartDate) {
-            _startDate = picked;
-          } else {
-            _endDate = picked;
-          }
-        });
-      }
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != (isStartDate ? _startDate : _endDate)) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = picked;
+        } else {
+          _endDate = picked;
+        }
+      });
     }
+  }
+
 
     String _formatDate(DateTime date) {
     final DateFormat formatter = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z');
@@ -107,57 +106,140 @@
     return formattedDate;
   }
 
+void _showEditDialog(DocumentSnapshot item) {
+    TextEditingController semesterNameController = TextEditingController(text: item['semester_name']);
+    TextEditingController startDateController = TextEditingController(text: _formatDate(item['start_date'].toDate()));
+    TextEditingController endDateController = TextEditingController(text: _formatDate(item['end_date'].toDate()));
+
+showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Semester'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      controller: semesterNameController,
+                      decoration: const InputDecoration(labelText: 'Semester Name'),
+                    ),
+                    TextField(
+                      controller: startDateController,
+                      decoration: const InputDecoration(labelText: 'Start Date'),
+                      keyboardType: TextInputType.datetime,
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: item['start_date'].toDate(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            startDateController.text = _formatDate(pickedDate);
+                          });
+                        }
+                      },
+                    ),
+                    TextField(
+                      controller: endDateController,
+                      decoration: const InputDecoration(labelText: 'End Date'),
+                      keyboardType: TextInputType.datetime,
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: item['end_date'].toDate(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            endDateController.text = _formatDate(pickedDate);
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Parse the dates from the text fields
+                    DateTime parsedStartDate = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z').parse(startDateController.text);
+                    DateTime parsedEndDate = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z').parse(endDateController.text);
+
+                    // Call the update function
+                    _updateSemester(
+                      item.id,
+                      parsedStartDate,
+                      semesterNameController.text,
+                      parsedEndDate,
+                    );
+
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Update'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
     @override
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
           title: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.add_box),
                 SizedBox(width: 10,),
-                Text('Add Semester', style: TextStyle(fontWeight: FontWeight.bold),),
+                Text('View Semesters', style: TextStyle(fontWeight: FontWeight.bold),),
+                
               ],
             ),
           ),
-        ),
-        body: 
-        Padding(padding: EdgeInsets.all(16), child: 
-        Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: ElevatedButton(
-                              
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(Color(0xff274c77)),
-                              ),
-                              onPressed: () {
-                                showDialog<String>(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                    AlertDialog(
-                                    title: const Center(child: Text("Add New Semester", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                                    content: SingleChildScrollView(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          TextField(
-                    controller: _semesterNameController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      labelText: 'Semester Name',
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide()
-                        
-                      ),
-                      prefixIcon: Icon(Icons.date_range),
-                      suffixIcon: Icon(Icons.info),
-
+          actions: [
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Color(0xff274c77)),
+                  ),
+                onPressed: () {
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) =>
+                      AlertDialog(
+                      title: const Center(child: Text("Add New Semester", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextField(
+                              controller: _semesterNameController,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: 'Semester Name',
+                                border: OutlineInputBorder(
+                                borderSide: BorderSide()
+                                ),
+                                prefixIcon: Icon(Icons.date_range),
+                                suffixIcon: Icon(Icons.info),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -220,24 +302,27 @@
                   ),
                   
                   SizedBox(height: 20),
-                  Center(
-                    
-                    child: ElevatedButton(
-                      onPressed: _addSemester,
-                      child: Text('Add Semester'),
-                    ),
-                  ),
-                                        ],
-                                      ),
-                                    )
-                                  )
-                                );
-                                
-                              },
-                              child: const Text('New Semester', style: TextStyle(color: Colors.white),)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _addSemester,
+                        child: Text('Add Semester'),
                             ),
-
-                  ),
+                          ),
+                        ],
+                      ),
+                    )
+                  )
+                );
+              },
+              child: const Text('New Semester', style: TextStyle(color: Colors.white),)
+            ),
+            SizedBox(width: 20,),
+          ],
+        ),
+        body: 
+        Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
                   Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('semester').snapshots(),
@@ -247,13 +332,14 @@
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text('No schedules found'));
+                return const Center(child: Text('No Semesters added yet.'));
               }
               
               var filteredDocs = snapshot.data!.docs;
-              String formatDate(DateTime dateTime) {
-                final DateFormat formatter = DateFormat('MM-dd-yyyy'); // Customize the format as needed
-                return formatter.format(dateTime);
+              String formatDate(DateTime date) {
+                final DateFormat formatter = DateFormat('MMMM dd, yyyy');
+                final String formattedDate = formatter.format(date.toLocal());
+                return formattedDate;
               }
 
               List<DataRow> rows = filteredDocs.map((item) {
@@ -271,7 +357,7 @@
                               backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 42, 92, 150)),
                             ),
                             onPressed: () {
-                              // _showEditDialog(item);
+                              _showEditDialog(item);
                             },
                             child: const Icon(Icons.settings, color: Colors.white),
                           ),
@@ -331,7 +417,7 @@
               
               return SingleChildScrollView(
                 child: Container(
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.center,
                   child: FittedBox(
                     child: Center(
                       child: Container(
@@ -339,30 +425,29 @@
                         child: DataTable(
                           columns: const <DataColumn>[
                             DataColumn(label: Expanded(child: Center(child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // PhosphorIcon(PhosphorIconsFill.chalkboard),
                                 Text('Semester Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
                             DataColumn(label: Expanded(child: Center(child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // PhosphorIcon(PhosphorIconsFill.graduationCap),
+                                 PhosphorIcon(PhosphorIconsFill.calendarDot),
                                 Text('Start Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
                             DataColumn(label: Expanded(child: Center(child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Icon(Icons.badge),
+                                 PhosphorIcon(PhosphorIconsFill.calendarDot),
                                 Text('End Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
                             DataColumn(label: Expanded(child: Center(child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Icon(Icons.badge),
+                                PhosphorIcon(PhosphorIconsFill.gearSix),
                                 Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
@@ -384,8 +469,6 @@
                   
                 ],
               ),
-        )
-        
       );
     }
   }

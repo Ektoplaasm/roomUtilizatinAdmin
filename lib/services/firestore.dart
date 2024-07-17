@@ -88,4 +88,13 @@ class FirestoreService {
   
 
   }
+
+  Future<void> updateSemester(String documentID, DateTime start_date, String semester_name, DateTime end_date) {
+  return listofsemester.doc(documentID).update({
+    'start_date': start_date,
+    'semester_name': semester_name,
+    'end_date': end_date,
+    'date_updated': DateTime.now(),
+  });
+  }
 }

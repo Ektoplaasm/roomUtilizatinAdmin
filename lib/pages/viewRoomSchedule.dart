@@ -47,7 +47,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('Edit Schedule'),
+            title: const Text('Edit Schedule', textAlign: TextAlign.center,),
             content: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -63,6 +63,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
                     controller: instructorController,
                     decoration: const InputDecoration(labelText: 'Instructor'),
                   ),
+                  SizedBox(height: 15,),
                   FutureBuilder<List<Map<String, dynamic>>>(
                     future: firestoreService.fetchRooms(),
                     builder: (context, snapshot) {
@@ -95,6 +96,7 @@ class _ViewRoomScheduleState extends State<ViewRoomSchedule> {
                       }
                     },
                   ),
+                  SizedBox(height: 15,),
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(
                       hintText: "Select a Day",
@@ -514,7 +516,7 @@ Widget build(BuildContext context) {
                   child: FittedBox(
                     child: Center(
                       child: Container(
-                        alignment: Alignment.center,
+                        alignment: Alignment.topCenter,
                         child: DataTable(
                           columns: const <DataColumn>[
                             DataColumn(label: Expanded(child: Center(child: Row(
@@ -560,7 +562,12 @@ Widget build(BuildContext context) {
                                 Text('Weekday', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                               ],
                             )))),
-                            DataColumn(label: Center(child: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))))
+                            DataColumn(label: Expanded(child: Center(child: Row(
+                              children: [
+                                PhosphorIcon(PhosphorIconsFill.gearSix),
+                                Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              ],
+                            )))),
                           ],
                           rows: rows,
                         ),
