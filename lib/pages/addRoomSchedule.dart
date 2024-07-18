@@ -408,34 +408,55 @@ class _HomePageState extends State<AddRoomSchedule> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                 ElevatedButton(
-                onPressed: () {
-                  firestoreService.addSched(
-                    classCode.text,
-                    courseCode.text,
-                    instructor.text,
-                    _selectedRoom!,
-                    selectedValueStart,
-                    selectedValueEnd,
-                    _selectedDay,
-                    _selectedSemester!,
-                    
-                  ).then((_) {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Schedule added successfully!'),
-                      ),
-                     );
-                  });
-                  
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)
-                  )
-                ),
-                child: const Text('Add Schedule',style: TextStyle(color: Colors.white),),
-              ),
+  onPressed: () {
+    firestoreService.addSched(
+      classCode.text,
+      courseCode.text,
+      instructor.text,
+      _selectedRoom!,
+      selectedValueStart,
+      selectedValueEnd,
+      _selectedDay,
+      _selectedSemester!,
+    ).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Schedule added successfully!'),
+        ),
+      );
+
+      // Clear the form
+      formKey.currentState!.reset();
+      classCode.clear();
+      courseCode.clear();
+      instructor.clear();
+      setState(() {
+        _selectedRoom = null;
+        _selectedDay = null;
+        _selectedSemester = null;
+        takenTimes = [];
+        selectedValueStart = 6;
+        selectedValueEnd = 6;
+      });
+    });
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: primaryColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  child: Container(
+    child: Row(
+      children: [
+        Icon(Icons.add, color: Colors.white,),
+        SizedBox(width: 5,),
+        const Text('Add Schedule', style: TextStyle(color: Colors.white),),
+      ],
+    ),
+  ),
+),
+
               const SizedBox(width: 20),
 
               ElevatedButton(onPressed: (){
@@ -463,7 +484,13 @@ class _HomePageState extends State<AddRoomSchedule> {
                   borderRadius: BorderRadius.circular(10)
                 )
               ),
-              child: const Text('Clear Form', style: TextStyle(color: Colors.white),))
+              child: Container(child: Row(
+                children: [
+                  Icon(Icons.clear, color: Colors.white,),
+                  SizedBox(width: 5,),
+                  const Text('Clear Form', style: TextStyle(color: Colors.white),),
+                ],
+              )))
               ],)
               
             ],

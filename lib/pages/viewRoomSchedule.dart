@@ -318,34 +318,62 @@ Widget build(BuildContext context) {
             const SizedBox(width: 10),
             const Text("View Schedules", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(width: 10),
-            DropdownButton<String>(
-              value: _selectedSemester,
-              hint: const Text('Select Semester'),
-              onChanged: _filterSchedules,
-              items: [
-                DropdownMenuItem<String>(
-                  value: 'all',
-                  child: const Text('All'),
-                ),
-                ..._semesters.map((semester) {
-                  return DropdownMenuItem<String>(
-                    value: semester['id'],
-                    child: Text(semester['semester_name']),
-                  );
-                }).toList(),
-              ],
+            Container(
+              decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0),
+              borderRadius: BorderRadius.circular(5.0), 
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: DropdownButton<String>(
+                underline: SizedBox(),
+                value: _selectedSemester,
+                hint: Container(child: Row(
+                  children: [
+                    const Icon(Icons.ads_click),
+                    SizedBox(width: 5,),
+                    const Text('Select Semester'),
+                  ],
+                )),
+                onChanged: _filterSchedules,
+                items: [
+                  DropdownMenuItem<String>(
+                    value: 'all',
+                    child: const Text('All'),
+                  ),
+                  ..._semesters.map((semester) {
+                    return DropdownMenuItem<String>(
+                      value: semester['id'],
+                      child: Text(semester['semester_name']),
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
             const SizedBox(width: 10),
-            DropdownButton<String>(
-              value: _selectedWeekday,
-              hint: const Text('Select Day'),
-              onChanged: _filterWeekdays,
-              items: _weekdays.map((weekday) {
-                return DropdownMenuItem<String>(
-                  value: weekday['id'],
-                  child: Text(weekday['name']),
-                );
-              }).toList(),
+            Container(
+              decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0),
+              borderRadius: BorderRadius.circular(5.0), 
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: DropdownButton<String>(
+                underline: SizedBox(),
+                value: _selectedWeekday,
+                hint: Container(child: Row(
+                  children: [
+                    const Icon(Icons.sunny),
+                    SizedBox(width: 5,),
+                    const Text('Select Day'),
+                  ],
+                )),
+                onChanged: _filterWeekdays,
+                items: _weekdays.map((weekday) {
+                  return DropdownMenuItem<String>(
+                    value: weekday['id'],
+                    child: Text(weekday['name']),
+                  );
+                }).toList(),
+              ),
             ),
           ],
         ),
@@ -569,7 +597,14 @@ Widget build(BuildContext context) {
                               ],
                             )))),
                           ],
-                          rows: rows,
+                          rows: rows.map((row) {
+                          final rowIndex = rows.indexOf(row);
+                          final color = rowIndex.isEven ? bgColor : Colors.white;
+                          return DataRow(
+                            color: WidgetStateColor.resolveWith((states) => color!),
+                            cells: row.cells,
+                          );
+                        }).toList(),
                         ),
                       ),
                     ),
