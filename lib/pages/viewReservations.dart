@@ -114,33 +114,65 @@ class _ViewReservationsState extends State<ViewReservations> {
               SizedBox(width: 10,),
               const Text("View Room Reservations", style: TextStyle(fontWeight: FontWeight.bold),),
             ],
-          )),
-          actions: [
-            DropdownButton<String>(
+          ),
+        ),
+        actions: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0), 
+              borderRadius: BorderRadius.circular(5.0), 
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.0), 
+            child: DropdownButton<String>(
               value: _selectedStatus,
               focusColor: Colors.white,
+              underline: SizedBox(), 
               items: reservationStatus.keys.map((String value) {
+                IconData iconData;
+                Color iconColor;
+                if (value == "Pending") {
+                  iconData = Icons.warning;
+                  iconColor = Colors.orange;
+                } else if (value == "Approved") {
+                  iconData = Icons.check_circle;
+                  iconColor = Colors.green;
+                } else if (value == "Disapproved") {
+                  iconData = Icons.cancel;
+                  iconColor = Colors.red;
+                } else {
+                  iconData = Icons.help;
+                  iconColor = Colors.grey;
+                }
+
                 return DropdownMenuItem(
                   value: value,
-                  child: Text(value),
+                  child: Row(
+                    children: [
+                      Icon(iconData, size: 20, color: iconColor), 
+                      SizedBox(width: 8), 
+                      Text(value),
+                    ],
+                  ),
                 );
               }).toList(),
               onChanged: (v) {
                 setState(() {
                   _selectedStatus = v;
-                  if(_selectedStatus == "Pending"){
-                      reserveStatus = 0;
-                  } else if(_selectedStatus == "Approved") {
-                      reserveStatus = 1; 
-                  } else if(_selectedStatus == "Disapproved"){
-                      reserveStatus = 2;
-                  };
+                  if (_selectedStatus == "Pending") {
+                    reserveStatus = 0;
+                  } else if (_selectedStatus == "Approved") {
+                    reserveStatus = 1;
+                  } else if (_selectedStatus == "Disapproved") {
+                    reserveStatus = 2;
+                  }
                 });
               },
             ),
-            SizedBox(width: 20,),
-          ],
+          ),
+          SizedBox(width: 20,),
+        ],
       ),
+      
       body: Column(children: [
         SingleChildScrollView(
         child: StreamBuilder<QuerySnapshot>(
@@ -438,7 +470,13 @@ class _ViewReservationsState extends State<ViewReservations> {
                                 )
                               )
                               ,
-                              child: const Text('View', style: TextStyle(color: Colors.white),),
+                              child: Container(child: Row(
+                                children: [
+                                  const Icon(Icons.remove_red_eye_outlined, color: Colors.white,),
+                                  SizedBox(width: 5,),
+                                  const Text('View', style: TextStyle(color: Colors.white),),
+                                ],
+                              )),
                             ),
                           ),
                           SizedBox(width: 10,),

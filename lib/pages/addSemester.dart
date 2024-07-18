@@ -1,4 +1,5 @@
-  import 'package:flutter/material.dart';
+  import 'package:admin_addschedule/themes/colors.dart';
+import 'package:flutter/material.dart';
   import 'package:admin_addschedule/services/firestore.dart';
   import 'package:intl/intl.dart';
   import 'package:cloud_firestore/cloud_firestore.dart';
@@ -303,10 +304,23 @@ showDialog(
                   
                   SizedBox(height: 20),
                     Center(
-                      child: ElevatedButton(
-                        onPressed: _addSemester,
-                        child: Text('Add Semester'),
-                            ),
+                      child: SizedBox(
+                        width: 200,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStatePropertyAll(Color(0xff274c77)),
+                          ),
+                          onPressed: _addSemester,
+                          child: Container(child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.add, color: Colors.white,),
+                              SizedBox(width: 5,),
+                              Text('Add Semester', style: TextStyle(color: Colors.white),),
+                            ],
+                          )),
+                              ),
+                      ),
                           ),
                         ],
                       ),
@@ -314,7 +328,13 @@ showDialog(
                   )
                 );
               },
-              child: const Text('New Semester', style: TextStyle(color: Colors.white),)
+              child: Container(child: Row(
+                children: [
+                  const Icon(Icons.add, color: Colors.white,),
+                  SizedBox(width: 5,),
+                  const Text('New Semester', style: TextStyle(color: Colors.white),),
+                ],
+              ))
             ),
             SizedBox(width: 20,),
           ],
@@ -454,7 +474,14 @@ showDialog(
                             
                           ],
                           // rows: filteredDocs,
-                          rows: rows
+                          rows: rows.map((row) {
+                          final rowIndex = rows.indexOf(row);
+                          final color = rowIndex.isEven ? bgColor : Colors.white;
+                          return DataRow(
+                            color: WidgetStateColor.resolveWith((states) => color!),
+                            cells: row.cells,
+                          );
+                        }).toList(),
                         ),
                       ),
                     ),
