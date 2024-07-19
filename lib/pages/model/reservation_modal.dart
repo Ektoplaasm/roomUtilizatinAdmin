@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
 import 'package:admin_addschedule/pages/model/reservations.dart';
 import 'package:admin_addschedule/pages/model/room.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -274,7 +275,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
         width: 500,
         height: 500,
         child: AlertDialog(
-          title: Text('Reserve Room'),
+          title: Center(child: Text('Reserve Room', style: TextStyle(fontWeight: FontWeight.bold),)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -418,9 +419,10 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   },
                   child: Text(
                     'Exit',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
@@ -429,6 +431,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
@@ -479,7 +482,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   },
                   child: Text(
                     'Submit',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ],
@@ -512,45 +515,52 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                     } else {
                       List<String> items =
                           snapshot.data!.map((room) => room.room_name).toList();
-                      return DropdownButton2<String>(
-                        underline: Container(),
-                        isExpanded: true,
-                        hint: Text(
-                          'Select Room',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).hintColor,
+                      return Container(
+                        decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 1.0),
+                        borderRadius: BorderRadius.circular(5.0), 
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: DropdownButton2<String>(
+                          underline: Container(),
+                          isExpanded: true,
+                          hint: Text(
+                            'Select Room',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).hintColor,
+                            ),
                           ),
-                        ),
-                        items: items
-                            .map((String item) => DropdownMenuItem<String>(
-                                  value: item,
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                          items: items
+                              .map((String item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
                                     ),
-                                  ),
-                                ))
-                            .toList(),
-                        value: selectedRoomId ?? items[0],
-                        onChanged: (String? newValue) {
-                          print(newValue);
-                          int selectedIndex = items.indexOf(newValue!);
-                          Room selectedRoom = snapshot.data![selectedIndex];
-                          print(selectedRoom.room_id);
-                          setState(() {
-                            selectedRoomId = newValue;
-                            roomID = selectedRoom.room_id;
-                          });
-                        },
-                        buttonStyleData: const ButtonStyleData(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          height: 40,
-                          width: 200,
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
+                                  ))
+                              .toList(),
+                          value: selectedRoomId ?? items[0],
+                          onChanged: (String? newValue) {
+                            print(newValue);
+                            int selectedIndex = items.indexOf(newValue!);
+                            Room selectedRoom = snapshot.data![selectedIndex];
+                            print(selectedRoom.room_id);
+                            setState(() {
+                              selectedRoomId = newValue;
+                              roomID = selectedRoom.room_id;
+                            });
+                          },
+                          buttonStyleData: const ButtonStyleData(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            height: 40,
+                            width: 200,
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            height: 40,
+                          ),
                         ),
                       );
                     }
@@ -558,6 +568,9 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
             ),
             Flexible(
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                ),
                 onPressed: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
@@ -571,12 +584,11 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                     date = picked!;
                   });
                 },
-                child: Text(formattedDate),
+                child: Text(formattedDate, style: TextStyle(color: Colors.white),),
               ),
             ),
           ])),
 
-      // Label for the second row
       Text("Time Selection", style: TextStyle(fontSize: 18)),
 
       Row(
@@ -584,32 +596,39 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
         children: [
           Flexible(
             child: DropdownButtonHideUnderline(
-              child: DropdownButton<int>(
-                hint: Text(startTimeMessage),
-                onChanged: (int? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      startTimeMessage = listOfTuples.firstWhere(
-                          (item) => item['value'] == newValue)['name'];
-                      startTime = newValue;
-                      endlistOfTuplesNotifier.value = [];
-                      if (endTimeMessage != "Select End Time") {
-                        if (startTime > endTime!) {
-                          endTime = null;
-                          endTimeMessage = "Select End Time";
+              child: Container(
+                decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1.0),
+                borderRadius: BorderRadius.circular(5.0), 
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                child: DropdownButton<int>(
+                  hint: Text(startTimeMessage),
+                  onChanged: (int? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        startTimeMessage = listOfTuples.firstWhere(
+                            (item) => item['value'] == newValue)['name'];
+                        startTime = newValue;
+                        endlistOfTuplesNotifier.value = [];
+                        if (endTimeMessage != "Select End Time") {
+                          if (startTime > endTime!) {
+                            endTime = null;
+                            endTimeMessage = "Select End Time";
+                          }
                         }
-                      }
-                      addEndStartMap();
-                    });
-                  }
-                },
-                items: listOfTuples.map((item) {
-                  int hour = int.parse(item['value'].toString());
-                  return DropdownMenuItem<int>(
-                    value: hour,
-                    child: Text('${item['name']}'),
-                  );
-                }).toList(),
+                        addEndStartMap();
+                      });
+                    }
+                  },
+                  items: listOfTuples.map((item) {
+                    int hour = int.parse(item['value'].toString());
+                    return DropdownMenuItem<int>(
+                      value: hour,
+                      child: Text('${item['name']}'),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
@@ -621,31 +640,39 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                 Widget? child) {
               return Flexible(
                 child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    hint: Text(endTimeMessage),
-                    onChanged: (int? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          endTimeMessage = endlistOfTuplesNotifier.firstWhere(
-                              (item) => item['value'] == newValue)['name'];
-                          endTime = newValue;
-                        });
-                      }
-                    },
-                    items: endlistOfTuplesNotifier.map((item) {
-                      int hour = int.parse(item['value'].toString());
-                      return DropdownMenuItem<int>(
-                        value: hour,
-                        child: Text('${item['name']}'),
-                      );
-                    }).toList(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey, width: 1.0),
+                    borderRadius: BorderRadius.circular(5.0), 
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: DropdownButton<int>(
+                      hint: Text(endTimeMessage),
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            endTimeMessage = endlistOfTuplesNotifier.firstWhere(
+                                (item) => item['value'] == newValue)['name'];
+                            endTime = newValue;
+                          });
+                        }
+                      },
+                      items: endlistOfTuplesNotifier.map((item) {
+                        int hour = int.parse(item['value'].toString());
+                        return DropdownMenuItem<int>(
+                          value: hour,
+                          child: Text('${item['name']}'),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               );
             },
           ),
         ],
-      )
+      ),
+      SizedBox(height: 10,),
     ]);
   }
 

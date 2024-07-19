@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:admin_addschedule/pages/calendar.dart';
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
 import 'package:admin_addschedule/pages/model/reservation_modal.dart';
 import 'package:admin_addschedule/pages/model/semester.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,7 +45,7 @@ class PietPaintingState extends State<PietPainting> {
       Provider.of<CalendarData>(context, listen: false)
           .updateSemester(currentSemester!);
     } else {
-      // Handle the case where no semester is found
+  
       print("No semester found.");
     }
   }
@@ -52,10 +53,10 @@ class PietPaintingState extends State<PietPainting> {
   Future<void> getAllSemester() async {
     List<Semester?> latestSemester = await Semester.fetchAllSemesters();
 
-    // Iterate over the list, handling potential null values
+   
     for (Semester? semesterNullable in latestSemester) {
       if (semesterNullable != null) {
-        // Cast the nullable Semester to a non-nullable Semester for printing
+       
         Semester semester = semesterNullable!;
         print(
             'Semester Name: ${semester.semester_name}, Start Date: ${semester.start_date.toDate()}, End Date: ${semester.end_date.toDate()}, Created Date: ${semester.date_created.toDate()}');
@@ -124,82 +125,97 @@ class PietPaintingState extends State<PietPainting> {
               width: 200,
               color: Colors.white,
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                ),
                 onPressed: () {
                   showModalExample(context);
                 },
-                icon: Icon(Icons.add),
-                label: Text('New Reservation'),
+                icon: Icon(Icons.add, color: Colors.white,),
+                label: Text('New Reservation', style: TextStyle(color: Colors.white),),
               ))),
           gridArea('se').containing(
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                          20), //border raiuds of dropdown button
-                      //blur radius of shadow
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(0),
-                      child: FutureBuilder<List<Semester?>>(
-                        future: Semester.fetchAllSemesters(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<Semester?>> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError ||
-                              snapshot.data == null) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else {
-                            // Find the index of the currentSemester in the list of items
-                            int? currentIndex = snapshot.data!.indexWhere(
-                                (item) => item?.id == currentSemester);
-
-                            return Material(
-                              child: DropdownButton<String>(
-                                underline: Container(),
-                                hint: Text(
-                                  'Select a semester',
-                                  style: TextStyle(fontFamily: 'Satoshi'),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: FutureBuilder<List<Semester?>>(
+                          future: Semester.fetchAllSemesters(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<Semester?>> snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError ||
+                                snapshot.data == null) {
+                              return Center(
+                                  child: Text('Error: ${snapshot.error}'));
+                            } else {
+                              
+                              int? currentIndex = snapshot.data!.indexWhere(
+                                  (item) => item?.id == currentSemester);
+                      
+                              return Material(
+                                child: Center(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey, width: 1.0),
+                                    borderRadius: BorderRadius.circular(5.0), 
+                                    ),
+                                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                                    child: DropdownButton<String>(
+                                      underline: Container(),
+                                      hint: Text(
+                                        'Select a semester',
+                                        style: TextStyle(fontFamily: 'Satoshi'),
+                                      ),
+                                      value: currentSemester,
+                                      onChanged: (String? newValue) {
+                                        print("New sem:${newValue}");
+                                        Provider.of<CalendarData>(context,
+                                                listen: false)
+                                            .updateSemester(newValue!);
+                                        setState(() {
+                                          currentSemester = newValue!;
+                                        });
+                                      },
+                                      items: snapshot.data!
+                                          .where((semester) =>
+                                              semester !=
+                                              null)
+                                          .map((Semester? semester) =>
+                                              DropdownMenuItem<String>(
+                                                value: semester?.id ??
+                                                    '',
+                                                child: Text(
+                                                    semester?.semester_name ?? '',
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            'Satoshi')),
+                                              ))
+                                          .toList(),
+                                    ),
+                                  ),
                                 ),
-                                value: currentSemester,
-                                onChanged: (String? newValue) {
-                                  print("New sem:${newValue}");
-                                  Provider.of<CalendarData>(context,
-                                          listen: false)
-                                      .updateSemester(newValue!);
-                                  setState(() {
-                                    currentSemester = newValue!;
-                                  });
-                                },
-                                items: snapshot.data!
-                                    .where((semester) =>
-                                        semester !=
-                                        null) // Filter out null semesters
-                                    .map((Semester? semester) =>
-                                        DropdownMenuItem<String>(
-                                          value: semester?.id ??
-                                              '', // Provide a default value if semester is null
-                                          child: Text(
-                                              semester?.semester_name ?? '',
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      'Satoshi')), // Provide a default text if semester is null
-                                        ))
-                                    .toList(),
-                              ),
-                            );
-                          }
-                        },
+                                
+                              );
+                              
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
                 ),
-                // Add other widgets here if needed
+            
               ],
             ),
           ),
