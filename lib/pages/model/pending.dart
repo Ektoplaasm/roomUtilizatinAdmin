@@ -1,6 +1,8 @@
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
 import 'package:admin_addschedule/pages/model/reservations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PendingModal extends StatelessWidget {
   @override
@@ -15,7 +17,7 @@ class PendingModal extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return AlertDialog(
-            title: Text('Pending Room Reservation'),
+            title: Center(child: Text('Pending Room Reservation', style: TextStyle(fontWeight: FontWeight.bold),)),
             content: SingleChildScrollView(
               child: Column(
                 children: [
@@ -24,24 +26,44 @@ class PendingModal extends StatelessWidget {
                     children: [
                       Container(
                         child: Center(
-                          child: Text('Name'),
+                          child: Text('Name', style: TextStyle(fontWeight: FontWeight.bold),),
                         ),
                         width: 300,
                       ),
                       Container(
-                        child: Center(child: Text('Room ID')),
+                        child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.chalkboardTeacher),
+                            Center(child: Text('Room ID', style: TextStyle(fontWeight: FontWeight.bold),)),
+                          ],
+                        ),
                         width: 150,
                       ),
                       Container(
-                        child: Center(child: Center(child: Text('Date'))),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_month),
+                            Center(child: Center(child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold),))),
+                          ],
+                        ),
                         width: 150,
                       ),
                       Container(
-                        child: Center(child: Center(child: Text('Start Time'))),
+                        child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.clockAfternoon),
+                            Center(child: Center(child: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold),))),
+                          ],
+                        ),
                         width: 150,
                       ),
                       Container(
-                        child: Center(child: Center(child: Text('End Time'))),
+                        child: Row(
+                          children: [
+                            PhosphorIcon(PhosphorIconsFill.clockAfternoon),
+                            Center(child: Center(child: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold),))),
+                          ],
+                        ),
                         width: 150,
                       ),
                     ],
@@ -54,9 +76,15 @@ class PendingModal extends StatelessWidget {
               ),
             ),
             actions: [
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Close'),
+                child: Text('Close', style: TextStyle(color: Colors.white),),
               ),
             ],
           );

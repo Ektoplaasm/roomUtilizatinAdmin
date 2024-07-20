@@ -25,14 +25,13 @@ class Room {
     for (var doc in querySnapshot.docs) {
       var data = doc.data();
       if (data != null && data is Map<String, dynamic>) {
-        // Ensure data is not null and is a Map
+        
         rooms.add(Room.fromMap(data));
       } else {
         print("Data is either null or not a Map<String, dynamic>");
       }
     }
 
-    // Sort the rooms alphabetically by room_name
     rooms.sort((a, b) => a.room_name.compareTo(b.room_name));
 
     return rooms;

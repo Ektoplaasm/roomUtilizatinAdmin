@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
 import 'package:admin_addschedule/pages/model/reservations.dart';
 import 'package:admin_addschedule/pages/model/room.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -240,7 +241,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
         endlistOfTuplesNotifier.value = [
           ...endlistOfTuplesNotifier.value,
           newTuple
-        ]; // Update the notifier
+        ]; 
       } else if (index <= 12) {
         Map<String, dynamic> newTuple = {'name': '${index}AM', 'value': index};
         endlistOfTuplesNotifier.value = [
@@ -274,7 +275,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
         width: 500,
         height: 500,
         child: AlertDialog(
-          title: Text('Reserve Room'),
+          title: Center(child: Text('Reserve Room', style: TextStyle(fontWeight: FontWeight.bold),)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -316,7 +317,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Expanded(
-                        // Ensure Expanded is a direct child of Row
                         child: ListTile(
                           title: const Text('Once'),
                           leading: Radio<int>(
@@ -331,7 +331,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                         ),
                       ),
                       Expanded(
-                        // Ensure Expanded is a direct child of Row
+                        
                         child: ListTile(
                           title: const Text('Spanned'),
                           leading: Radio<int>(
@@ -346,7 +346,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                         ),
                       ),
                       Expanded(
-                        // Ensure Expanded is a direct child of Row
+                        
                         child: ListTile(
                           title: const Text('Recurring'),
                           leading: Radio<int>(
@@ -372,6 +372,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                               ? recurringWidget()
                               : Container(),
                 ),
+                SizedBox(height: 10,),
                 Container(
                   width: double.infinity,
                   child: TextFormField(
@@ -418,20 +419,22 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   },
                   child: Text(
                     'Exit',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(5)),
                     elevation: 5,
                   ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(5)),
                     elevation: 5,
                   ),
                   onPressed: () {
@@ -479,7 +482,7 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   },
                   child: Text(
                     'Submit',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ],
@@ -494,7 +497,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
 
   Widget onceWidget() {
     return Column(children: <Widget>[
-      // Label for the first row
       Text("Room Selection and Date Setting", style: TextStyle(fontSize: 18)),
 
       Padding(
@@ -506,51 +508,59 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   future: futureRooms,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator(); // Show loading indicator instead of empty text
+                      return CircularProgressIndicator();
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
                       List<String> items =
                           snapshot.data!.map((room) => room.room_name).toList();
-                      return DropdownButton2<String>(
-                        underline: Container(),
-                        isExpanded: true,
-                        hint: Text(
-                          'Select Room',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).hintColor,
+                      return Container(
+                        height: 33,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1.0), 
+                          borderRadius: BorderRadius.circular(5.0), 
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12.0), 
+                        child: DropdownButton2<String>(
+                          underline: Container(),
+                          isExpanded: true,
+                          hint: Text(
+                            'Select Room',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).hintColor,
+                            ),
                           ),
-                        ),
-                        items: items
-                            .map((String item) => DropdownMenuItem<String>(
-                                  value: item,
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                          items: items
+                              .map((String item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
                                     ),
-                                  ),
-                                ))
-                            .toList(),
-                        value: selectedRoomId ?? items[0],
-                        onChanged: (String? newValue) {
-                          print(newValue);
-                          int selectedIndex = items.indexOf(newValue!);
-                          Room selectedRoom = snapshot.data![selectedIndex];
-                          print(selectedRoom.room_id);
-                          setState(() {
-                            selectedRoomId = newValue;
-                            roomID = selectedRoom.room_id;
-                          });
-                        },
-                        buttonStyleData: const ButtonStyleData(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          height: 40,
-                          width: 200,
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
+                                  ))
+                              .toList(),
+                          value: selectedRoomId ?? items[0],
+                          onChanged: (String? newValue) {
+                            print(newValue);
+                            int selectedIndex = items.indexOf(newValue!);
+                            Room selectedRoom = snapshot.data![selectedIndex];
+                            print(selectedRoom.room_id);
+                            setState(() {
+                              selectedRoomId = newValue;
+                              roomID = selectedRoom.room_id;
+                            });
+                          },
+                          buttonStyleData: const ButtonStyleData(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            height: 40,
+                            width: 200,
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            height: 40,
+                          ),
                         ),
                       );
                     }
@@ -558,6 +568,12 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
             ),
             Flexible(
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
                 onPressed: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
@@ -567,49 +583,59 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                   );
                   if (picked != null && picked != DateTime.now()) print(picked);
                   setState(() {
-                    formattedDate = DateFormat('MMMM dd,yyyy').format(picked!);
+                    formattedDate = DateFormat('MMMM dd,yyyy',).format(picked!);
                     date = picked!;
                   });
                 },
-                child: Text(formattedDate),
+                child: Text(formattedDate, style: TextStyle(color: Colors.white),),
               ),
             ),
           ])),
 
-      // Label for the second row
+      
       Text("Time Selection", style: TextStyle(fontSize: 18)),
+
+      SizedBox(height: 10,),
 
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Flexible(
             child: DropdownButtonHideUnderline(
-              child: DropdownButton<int>(
-                hint: Text(startTimeMessage),
-                onChanged: (int? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      startTimeMessage = listOfTuples.firstWhere(
-                          (item) => item['value'] == newValue)['name'];
-                      startTime = newValue;
-                      endlistOfTuplesNotifier.value = [];
-                      if (endTimeMessage != "Select End Time") {
-                        if (startTime > endTime!) {
-                          endTime = null;
-                          endTimeMessage = "Select End Time";
+              child: Container(
+                height: 35,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 1.0), 
+                  borderRadius: BorderRadius.circular(5.0), 
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 12.0), 
+                child: DropdownButton<int>(
+                  hint: Text(startTimeMessage),
+                  onChanged: (int? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        startTimeMessage = listOfTuples.firstWhere(
+                            (item) => item['value'] == newValue)['name'];
+                        startTime = newValue;
+                        endlistOfTuplesNotifier.value = [];
+                        if (endTimeMessage != "Select End Time") {
+                          if (startTime > endTime!) {
+                            endTime = null;
+                            endTimeMessage = "Select End Time";
+                          }
                         }
-                      }
-                      addEndStartMap();
-                    });
-                  }
-                },
-                items: listOfTuples.map((item) {
-                  int hour = int.parse(item['value'].toString());
-                  return DropdownMenuItem<int>(
-                    value: hour,
-                    child: Text('${item['name']}'),
-                  );
-                }).toList(),
+                        addEndStartMap();
+                      });
+                    }
+                  },
+                  items: listOfTuples.map((item) {
+                    int hour = int.parse(item['value'].toString());
+                    return DropdownMenuItem<int>(
+                      value: hour,
+                      child: Text('${item['name']}'),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
@@ -621,24 +647,32 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                 Widget? child) {
               return Flexible(
                 child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    hint: Text(endTimeMessage),
-                    onChanged: (int? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          endTimeMessage = endlistOfTuplesNotifier.firstWhere(
-                              (item) => item['value'] == newValue)['name'];
-                          endTime = newValue;
-                        });
-                      }
-                    },
-                    items: endlistOfTuplesNotifier.map((item) {
-                      int hour = int.parse(item['value'].toString());
-                      return DropdownMenuItem<int>(
-                        value: hour,
-                        child: Text('${item['name']}'),
-                      );
-                    }).toList(),
+                  child: Container(
+                    height: 35,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1.0), 
+                      borderRadius: BorderRadius.circular(5.0), 
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12.0), 
+                    child: DropdownButton<int>(
+                      hint: Text(endTimeMessage),
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            endTimeMessage = endlistOfTuplesNotifier.firstWhere(
+                                (item) => item['value'] == newValue)['name'];
+                            endTime = newValue;
+                          });
+                        }
+                      },
+                      items: endlistOfTuplesNotifier.map((item) {
+                        int hour = int.parse(item['value'].toString());
+                        return DropdownMenuItem<int>(
+                          value: hour,
+                          child: Text('${item['name']}'),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               );
@@ -977,7 +1011,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                   title: const Text('Monday'),
                   leading: Checkbox(
@@ -989,7 +1022,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
                       })),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Tuesday'),
                 leading: Checkbox(
@@ -1002,7 +1034,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
               ),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Wednesday'),
                 leading: Checkbox(
@@ -1015,7 +1046,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
               ),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Thursday'),
                 leading: Checkbox(
@@ -1028,7 +1058,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
               ),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Friday'),
                 leading: Checkbox(
@@ -1041,7 +1070,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
               ),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Saturday'),
                 leading: Checkbox(
@@ -1054,7 +1082,6 @@ class RoomSelectionWidgetState extends State<ReservationModal> {
               ),
             ),
             Expanded(
-              // Ensure Expanded is a direct child of Row
               child: ListTile(
                 title: const Text('Sunday'),
                 leading: Checkbox(

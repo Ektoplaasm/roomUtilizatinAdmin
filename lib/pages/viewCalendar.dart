@@ -1,8 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:admin_addschedule/pages/calendar.dart';
+import 'package:admin_addschedule/pages/homewithsidenav.dart';
+import 'package:admin_addschedule/pages/model/map.dart';
+import 'package:admin_addschedule/pages/model/pending.dart';
 import 'package:admin_addschedule/pages/model/reservation_modal.dart';
 import 'package:admin_addschedule/pages/model/semester.dart';
+import 'package:admin_addschedule/pages/ui_components.dart';
+import 'package:admin_addschedule/themes/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
@@ -10,28 +17,43 @@ import 'package:provider/provider.dart';
 
 import 'model/notifier.dart';
 
+const Color primaryColor = Color(0xff274c77);
 
-const cellRed = Color(0xffc73232);
-const cellMustard = Color(0xffd7aa22);
-const cellGrey = Color(0xffcfd4e0);
-const cellBlue = Color(0xff1553be);
-const background = Color.fromARGB(0, 36, 40, 48);
-
-class PietPainting extends StatefulWidget {
-  final Function(String, String)? onRoomUpdated;
-
-  const PietPainting({Key? key, this.onRoomUpdated}) : super(key: key);
+class Map_Display extends StatefulWidget {
+  const Map_Display({Key? key}) : super(key: key);
 
   @override
-  PietPaintingState createState() => PietPaintingState();
+  State<Map_Display> createState() => _Map_DisplayState();
 }
 
-class PietPaintingState extends State<PietPainting> {
+class _Map_DisplayState extends State<Map_Display> {
+  late String base64 = '';
+  late String currentSemester = '';
+  late int currentFloor = 1;
+  String? selectedRoom;
 
-    late String currentSemester;
+  @override
+  void initState() {
+    super.initState();
+    getLatestSemester();
+  }
 
-  String getCurrentSemester() {
-    return currentSemester;
+  void showModalReservation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ReservationModal();
+      },
+    );
+  }
+
+  void showModalPending(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PendingModal();
+      },
+    );
   }
 
   Future<void> getLatestSemester() async {
@@ -42,180 +64,208 @@ class PietPaintingState extends State<PietPainting> {
         currentSemester = latestSemester.id!;
       });
       Provider.of<CalendarData>(context, listen: false)
-          .updateSemester(currentSemester!);
+          .updateSemester(currentSemester);
     } else {
-      // Handle the case where no semester is found
       print("No semester found.");
     }
   }
 
-  Future<void> getAllSemester() async {
-    List<Semester?> latestSemester = await Semester.fetchAllSemesters();
-
-    // Iterate over the list, handling potential null values
-    for (Semester? semesterNullable in latestSemester) {
-      if (semesterNullable != null) {
-        // Cast the nullable Semester to a non-nullable Semester for printing
-        Semester semester = semesterNullable!;
-        print(
-            'Semester Name: ${semester.semester_name}, Start Date: ${semester.start_date.toDate()}, End Date: ${semester.end_date.toDate()}, Created Date: ${semester.date_created.toDate()}');
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    getLatestSemester();
-    getAllSemester();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
-    final columnSizes = screenSize.width > 600
-        ? [3.0.fr, 3.0.fr, 3.0.fr, 3.7.fr, 3.fr, 3.fr]
-        : [10.0.fr, 10.0.fr];
-    final rowSizes = screenSize.width > 600
-        ? [1.fr, 3.0.fr, 3.0.fr, 3.0.fr, 3.0.fr, 3.0.fr, 1.fr, 1.fr]
-        : [.5.fr, 1.0.fr, 1.0.fr, .5.fr, 1.0.fr, .5.fr];
-    final areas = screenSize.width > 600
-        ? '''
-        hd hd hd na se se
-        ca ca ca ca ca ca
-        ca ca ca ca ca ca
-        ca ca ca ca ca ca
-        ca ca ca ca ca ca
-        ca ca ca ca ca ca
-        fl fl fl bw bw bw
-        fo fo fo fo fo fo
-        '''
-        : '''
-        hd hd
-        cf2 cf2
-        cf2 cf2
-        fl fl
-        ca ca
-        fo fo
-        ''';
-
-    void showModalExample(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return ReservationModal();
-        },
-      );
-    }
-
-    return Container(
-      color: background,
-      child: LayoutGrid(
-        columnGap: 0,
-        rowGap: 0,
-        areas: areas,
-        columnSizes: columnSizes,
-        rowSizes: rowSizes,
-        children: [
-          gridArea('ca').containing(CalendarWidget()),
-          gridArea('hd').containing(Container(color: Colors.white)),
-          gridArea('na').containing(Container(
-              width: 200,
-              color: Colors.white,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  showModalExample(context);
-                },
-                icon: Icon(Icons.add),
-                label: Text('New Reservation'),
-              ))),
-          gridArea('se').containing(
-            Column(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Center(
+          child: Row(
+            
+            children: [
+              Icon(Icons.calendar_month),
+              SizedBox(width: 5,),
+              Text(
+                "Calendar",
+                style: TextStyle(fontWeight: FontWeight.bold,),
+              ),
+              
+            ],
+          ),
+        ),
+        actions: [
+          Container(
+            child: Row(
               children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                          20), //border raiuds of dropdown button
-                      //blur radius of shadow
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(0),
-                      child: FutureBuilder<List<Semester?>>(
-                        future: Semester.fetchAllSemesters(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<Semester?>> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError ||
-                              snapshot.data == null) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else {
-                            // Find the index of the currentSemester in the list of items
-                            int? currentIndex = snapshot.data!.indexWhere(
-                                (item) => item?.id == currentSemester);
-
-                            return Material(
-                              child: DropdownButton<String>(
-                                underline: Container(),
-                                hint: Text(
-                                  'Select a semester',
-                                  style: TextStyle(fontFamily: 'Satoshi'),
-                                ),
-                                value: currentSemester,
-                                onChanged: (String? newValue) {
-                                  print("New sem:${newValue}");
-                                  Provider.of<CalendarData>(context,
-                                          listen: false)
-                                      .updateSemester(newValue!);
-                                  setState(() {
-                                    currentSemester = newValue!;
-                                  });
-                                },
-                                items: snapshot.data!
-                                    .where((semester) =>
-                                        semester !=
-                                        null) // Filter out null semesters
-                                    .map((Semester? semester) =>
-                                        DropdownMenuItem<String>(
-                                          value: semester?.id ??
-                                              '', // Provide a default value if semester is null
-                                          child: Text(
-                                              semester?.semester_name ?? '',
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      'Satoshi')), // Provide a default text if semester is null
-                                        ))
-                                    .toList(),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
+                SemesterDropdown(),
+                SizedBox(width: 10),
+                RoomDropdown(),
+                SizedBox(width: 10,),
+                ElevatedButton(onPressed: () {
+                  showModalReservation(context);
+                }, child: Row(
+                  children: [
+                    Icon(Icons.post_add_rounded, color: Colors.white,),
+                    SizedBox(width: 5,),
+                    Text("Reservation", style: TextStyle(color: Colors.white),),
+                  ],
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
-                // Add other widgets here if needed
-              ],
-            ),
-          ),
-          gridArea('fl').containing(Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+                ),
+                SizedBox(width: 10,),
+                ElevatedButton(onPressed: () {
+                  showModalPending(context);
+                }, child: Row(
+                  children: [
+                    Icon(Icons.pending_actions, color: Colors.white,),
+                    SizedBox(width: 5,),
+                    Text("Pending", style: TextStyle(color: Colors.white),),
+                  ],
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                ),
+                
+                SizedBox(width: 10,),
                 
               ],
             ),
-          )),
-
-          gridArea('bw').containing(Container(color: Colors.white)),
-          gridArea('fo').containing(Container(color: Colors.white)),
+          )
         ],
       ),
+      body: Center(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(child: CalendarWidget()),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class RoomDropdown extends StatefulWidget {
+  @override
+  _RoomDropdownState createState() => _RoomDropdownState();
+}
+
+class _RoomDropdownState extends State<RoomDropdown> {
+  String? selectedRoom;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('rooms').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) return CircularProgressIndicator();
+
+        List<DropdownMenuItem<String>> roomItems = snapshot.data!.docs
+            .map((DocumentSnapshot document) {
+          return DropdownMenuItem<String>(
+            value: document.id,
+            child: Text(
+              document['room_name'],
+              style: TextStyle(fontFamily: 'Satoshi'),
+            ),
+          );
+        }).toList();
+
+        return Container(
+          height: 35,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0), 
+              borderRadius: BorderRadius.circular(5.0), 
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.0), 
+          child: DropdownButton<String>(
+            underline: Container(),
+            value: selectedRoom,
+            hint: Text(
+              'Select a room',
+              style: TextStyle(fontFamily: 'Satoshi'),
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedRoom = newValue;
+              });
+              if (newValue != null) {
+                DocumentSnapshot selectedDocument = snapshot.data!.docs
+                    .firstWhere((doc) => doc.id == newValue);
+                print('Room selected: ${selectedDocument.id}');
+                Provider.of<CalendarData>(context, listen: false)
+                    .updateCalendar(selectedDocument['room_id']);
+              }
+            },
+            items: roomItems,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SemesterDropdown extends StatefulWidget {
+  @override
+  _SemesterDropdownState createState() => _SemesterDropdownState();
+}
+
+class _SemesterDropdownState extends State<SemesterDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Semester?>>(
+      future: Semester.fetchAllSemesters(),
+      builder: (BuildContext context, AsyncSnapshot<List<Semester?>> snapshot) {
+        if (!snapshot.hasData) return CircularProgressIndicator();
+
+        return Container(
+            height: 35,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0), 
+              borderRadius: BorderRadius.circular(5.0), 
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.0), 
+            child: DropdownButton<String>(
+            underline: Container(),
+            hint: Text(
+              'Select a semester',
+              style: TextStyle(fontFamily: 'Satoshi'),
+            ),
+            value: Provider.of<CalendarData>(context).semesterId,
+            onChanged: (String? newValue) {
+              print("New sem:${newValue}");
+              Provider.of<CalendarData>(context, listen: false)
+                  .updateSemester(newValue!);
+            },
+            items: snapshot.data!
+                .where((semester) => semester != null)
+                .map((Semester? semester) => DropdownMenuItem<String>(
+                      value: semester?.id ?? '',
+                      child: Text(semester?.semester_name ?? '',
+                          style: TextStyle(fontFamily: 'Satoshi')),
+                    ))
+                .toList(),
+          ),
+        );
+      },
     );
   }
 }
