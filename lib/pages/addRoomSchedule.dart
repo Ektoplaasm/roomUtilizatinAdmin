@@ -279,34 +279,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       );
                     }).toList(),
                   ),
-              // MultiSelectDropDown(
-              //   controller: selecteddayoftheweek,
-              //   onOptionSelected: (options) {
-              //     setState(() {
-              //       selectedDays = options;
-              //     });
-                  
-              //   },
-                
-              //   inputDecoration: BoxDecoration(
-                  
-                  // borderRadius: BorderRadius.all(Radius.circular(5)),
-                  // border: Border.all(color: Colors.black),
-                  
-              //   ),
-                
-                // hint: 'Select the day of the week.',
-                // hintStyle: TextStyle(fontSize: 17,), 
-                
-                
-              //   options: dayoftheweek,
-              //   maxItems: 7,
-              //   selectionType: SelectionType.multi,
-              //   chipConfig: const ChipConfig(wrapType: WrapType.wrap, backgroundColor: Colors.black),
-              //   dropdownHeight: 300,
-              //   optionTextStyle: const TextStyle(fontSize: 16, color: Colors.black),
-              //   selectedOptionIcon: const Icon(Icons.check_circle, color: Colors.black,),
-              // ),
+              
               
               SizedBox(height: 15,),
 
@@ -320,7 +293,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                       children: [
                         PhosphorIcon(PhosphorIconsFill.warning, color: Colors.red,),
                         SizedBox(width: 5,),
-                        Text('Allow conflicting times', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
+                        Text('Allow conflicting time', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),
                       ],
                     ),
                     value: allowConflicts,
@@ -333,7 +306,6 @@ class _HomePageState extends State<AddRoomSchedule> {
                 ],
               ),
               ),
-
 
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -441,7 +413,6 @@ class _HomePageState extends State<AddRoomSchedule> {
                       ),
                     );
 
-                    // Clear the form
                     formKey.currentState!.reset();
                     classCode.clear();
                     courseCode.clear();
@@ -459,7 +430,7 @@ class _HomePageState extends State<AddRoomSchedule> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
                 child: Container(
@@ -497,7 +468,7 @@ class _HomePageState extends State<AddRoomSchedule> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)
+                  borderRadius: BorderRadius.circular(5)
                 )
               ),
               child: Container(child: Row(

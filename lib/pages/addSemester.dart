@@ -169,17 +169,15 @@ showDialog(
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop(); 
                   },
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Parse the dates from the text fields
                     DateTime parsedStartDate = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z').parse(startDateController.text);
                     DateTime parsedEndDate = DateFormat('MMMM dd, yyyy \'at\' hh:mm:ss a \'UTC\'Z').parse(endDateController.text);
 
-                    // Call the update function
                     _updateSemester(
                       item.id,
                       parsedStartDate,
@@ -187,7 +185,7 @@ showDialog(
                       parsedEndDate,
                     );
 
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Update'),
                 ),
@@ -217,9 +215,12 @@ showDialog(
           ),
           actions: [
             ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Color(0xff274c77)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
                   ),
+                ),
                 onPressed: () {
                   showDialog<String>(
                     context: context,
@@ -307,8 +308,11 @@ showDialog(
                       child: SizedBox(
                         width: 200,
                         child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStatePropertyAll(Color(0xff274c77)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
                           ),
                           onPressed: _addSemester,
                           child: Container(child: Row(
@@ -370,6 +374,7 @@ showDialog(
                   DataCell(Center(child: Text(formatDate(DateTime.fromMillisecondsSinceEpoch(item['end_date'].toDate().millisecondsSinceEpoch))))),
                   DataCell(
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Center(
                           child: ElevatedButton(
@@ -447,29 +452,40 @@ showDialog(
                             DataColumn(label: Expanded(child: Center(child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text('Semester Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                SizedBox(
+                                  width: 300,
+                                  child: Center(child: Text('Semester Name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)))),
                               ],
                             )))),
-                            DataColumn(label: Expanded(child: Center(child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                 PhosphorIcon(PhosphorIconsFill.calendarDot),
-                                Text('Start Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                              ],
+                            DataColumn(label: Expanded(child: Center(child: SizedBox(
+                              width: 300,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  PhosphorIcon(PhosphorIconsFill.calendarDot),
+                                  Text('Start Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                ],
+                              ),
                             )))),
-                            DataColumn(label: Expanded(child: Center(child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                 PhosphorIcon(PhosphorIconsFill.calendarDot),
-                                Text('End Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                              ],
+                            DataColumn(label: Expanded(child: Center(child: SizedBox(
+                              width: 300,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                   PhosphorIcon(PhosphorIconsFill.calendarDot),
+                                  Text('End Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                ],
+                              ),
                             )))),
-                            DataColumn(label: Expanded(child: Center(child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                PhosphorIcon(PhosphorIconsFill.gearSix),
-                                Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                              ],
+                            DataColumn(label: Expanded(child: Center(child: SizedBox(
+                              width: 300,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  PhosphorIcon(PhosphorIconsFill.gearSix),
+                                  Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                ],
+                              ),
                             )))),
                             
                           ],

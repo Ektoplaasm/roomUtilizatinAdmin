@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarWidget extends StatelessWidget {
-  // PietPaintingState main = PietPaintingState();
-
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<CalendarData>(context);

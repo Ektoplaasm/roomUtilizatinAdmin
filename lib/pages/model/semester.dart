@@ -11,7 +11,6 @@ class Semester {
       this.date_created);
 
   static Semester fromMap(Map<String, dynamic> map, [String? id]) {
-    // Provide default values for fields that might be null
     String semesterName = map['semester_name'] ?? '';
     Timestamp startDate = map['start_date'] != null
         ? map['start_date'] as Timestamp
@@ -69,7 +68,6 @@ class Semester {
       return null;
     }
 
-    // Pass the document ID to the fromMap method
     return Semester.fromMap(
         snapshot.data() as Map<String, dynamic>, snapshot.id);
   }
